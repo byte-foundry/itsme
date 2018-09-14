@@ -1,0 +1,20 @@
+{
+  "name": "itsme",
+  "version": "1.0.0",
+  "description": "Use your unique font in Gmail.",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "parcel build src/index.js -d build/ -o bundle.js",
+    "watch": "parcel watch src/index.js -d build/ -o bundle.js"
+  },
+  "dependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "emotion": "^9.2.8",
+    "parcel-bundler": "^1.9.7",
+    "react": "^16.5.1",
+    "react-dom": "^16.5.1",
+    "react-emotion": "^9.2.8"
+  },
+  "browserslist": "last 2 chrome version, last 2 firefox version"
+}
