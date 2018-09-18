@@ -4,8 +4,8 @@
   "description": "Use your unique font in Gmail.",
   "main": "src/index.js",
   "scripts": {
-    "build": "parcel build src/index.js -d build/ -o bundle.js",
-    "watch": "parcel watch src/index.js -d build/ -o bundle.js"
+    "build": "parcel build src/index.js -d build/ -o bundle.js --public-url /build",
+    "watch": "parcel watch src/index.js -d build/ -o bundle.js --public-url /build"
   },
   "dependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",

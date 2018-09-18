@@ -4,9 +4,13 @@ import styled from 'react-emotion';
 import Login from './Login';
 import SelectFont from './SelectFont';
 
+import {buttonDefault} from '../defaultStyles';
+import {colors} from '../variables';
+
+
 const Mask = styled('div')`
   position: absolute;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(41, 56, 69, 0.6);
   top: 0;
   left: 0;
   right: 0;
@@ -14,22 +18,60 @@ const Mask = styled('div')`
   z-index: 10000000;
 `;
 
+
 const Popout = styled('div')`
   position: absolute;
   top: 0;
-  width: 500px;
+  width: 350px;
   bottom: 0;
-  height: 500px;
   background: #fff;
   z-index: 10000001;
   margin: auto;
   right: 0;
-  left: 0;
-  box-shadow: 0 0 26px #aaa;
-  padding: 10px;
+  padding: 45px 35px;
   display: flex;
   flex-direction: column;
+  border: 1px solid ${colors.backgroundSecondary};
 `;
+
+const CloseButton = styled('button')`
+  composes: ${buttonDefault};
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    height: 5px;
+    width: 20px;
+    top: 50%;
+    left: 0;
+    margin-top: -1px;
+    background: ${colors.important};
+  }
+  &::before {
+    transform: rotate(45deg);
+  }
+  &::after {
+    transform: rotate(-45deg);
+  }
+`;
+
+const Title = styled('h1')`
+  color: ${colors.text};
+  margin-bottom: 5px;
+  margin-top: 5px;
+`
+
+const SubTitle = styled('h3')`
+  color: ${colors.textSecondary};
+  font-style: italic;
+  margin-top: 5px;
+  font-weight: normal;
+`
 
 export default class Modal extends React.Component {
   constructor() {
@@ -66,10 +108,9 @@ export default class Modal extends React.Component {
       <React.Fragment>
         <Mask onClick={close} />
         <Popout>
-          <div>
-            <button onClick={close}>Close</button>
-          </div>
-
+            <CloseButton onClick={close}/>
+            <Title>It's Me</Title>
+            <SubTitle>Attach your identity to your emails.</SubTitle>
           {/* Steps */}
           {currentStep === 'login' && (
             <Login

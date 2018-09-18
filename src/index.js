@@ -27,14 +27,13 @@ const observer = new MutationObserver((mutationsList) => {
 
       observer.disconnect();
 
-      // Gmail menu bar above the email list
-      // Since it's a specific id, it might not change in the future
-      const menuBar = document.getElementById(':5');
-      const actions = menuBar.querySelector('.bzn :first-child');
+      // Gmail action bar on top of the page
+      // Since it's a specific class, it might change in the future
+      const actions = document.querySelector('.gb_Dc.gb_jb.gb_Cc.gb_7d');
 
       // Adding the app into the menu bar
       const newDiv = document.createElement('div');
-      actions.appendChild(newDiv);
+      actions.insertBefore(newDiv, actions.firstChild);
 
       ReactDOM.render(<App />, newDiv);
     }
