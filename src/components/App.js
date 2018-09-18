@@ -1,49 +1,49 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import styled from 'react-emotion';
 
-import Login from './Login';
-import SelectFont from './SelectFont';
+import Modal from './Modal';
 
-const Popout = styled('div')`
-  position: absolute;
-  top: 0;
-  width: 500px;
-  bottom: 0;
-  height: 500px;
-  background: #fff;
-  z-index: 100000000;
-  margin: auto;
-  right: 0;
-  left: 0;
-  box-shadow: 0 0 26px #aaa;
-  padding: 10px;
+const OpenPopoutButton = styled('button')`
+  z-index: 1;
 `;
 
 export default class App extends React.Component {
   constructor() {
     super();
 
+    this.modalRoot = document.createElement('div');
+
     this.state = {
-      isOpen: true,
-      currentStep: 'login',
+      isOpen: false,
     };
   }
 
-  render() {
-    const {isOpen, currentStep} = this.state;
+  componentDidMount() {
+    document.body.appendChild(this.modalRoot);
+  }
 
-    if (!isOpen) {
-      return null;
-    }
+  componentWillUnmount() {
+    document.body.removeChild(this.modalRoot);
+  }
+
+  render() {
+    const { isOpen } = this.state;
 
     return (
-      <Popout>
-        <button onClick={() => this.setState({isOpen: false})}>Close</button>
-        {currentStep === 'login' && (
-          <Login onLogin={() => this.setState({ currentStep: 'selectFont' })} />
-        )}
-        {currentStep === 'selectFont' && <SelectFont />}
-      </Popout>
+      <React.Fragment>
+        <OpenPopoutButton
+          className="G-Ni J-J5-Ji"
+          onClick={() => this.setState({ isOpen: true })}
+        >
+          It's me
+        </OpenPopoutButton>
+        {isOpen &&
+          ReactDOM.createPortal(
+            <Modal close={() => this.setState({ isOpen: false })} />,
+            this.modalRoot
+          )}
+      </React.Fragment>
     );
   }
 }

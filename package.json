@@ -8,6 +8,7 @@
     "watch": "parcel watch src/index.js -d build/ -o bundle.js"
   },
   "dependencies": {
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "emotion": "^9.2.8",
