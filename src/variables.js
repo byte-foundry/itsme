@@ -8,4 +8,5 @@ export const colors = {
   textPrimary: '#6558F5',
   important: '#D3455B',
   success: '#1AAE9F',
+  disabled: '#DFE7ED',
 }

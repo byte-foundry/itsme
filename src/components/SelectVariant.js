@@ -33,27 +33,29 @@ const FontOption = styled('div')`
   }
 `;
 
-const SelectFont = ({ fonts = [], selected, onSelectFont }) => {
+const SelectVariant = ({ selected, onSelectVariant, selectedFamily }) => {
   const cellRenderer = ({ columnIndex, key, rowIndex, style }) => ( 
     <FontOption
       key={key}
-      name={list[rowIndex][columnIndex]} selected={selected && (list[rowIndex][columnIndex] === selected.family)}
-      onClick={() => onSelectFont(fonts.find(f => f.family === list[rowIndex][columnIndex]))}
+      name={list[rowIndex][columnIndex]} selected={selected && (list[rowIndex][columnIndex] === selected)}
+      onClick={() => onSelectVariant(list[rowIndex][columnIndex])}
       style={{
         ...style,
-        fontFamily: `${list[rowIndex][columnIndex]}, sans-serif`,
+        fontFamily: `${selectedFamily.family}, sans-serif`,
+        fontWeight: list[rowIndex][columnIndex].split('italic')[0],
+        fontStyle: list[rowIndex][columnIndex].split('italic').length > 1 ? 'italic' : 'normal',
       }}
     >
-      {list[rowIndex][columnIndex]}
+      {selectedFamily.family} {list[rowIndex][columnIndex]}
       <style>
-        {`@import url("https://fonts.googleapis.com/css?family=${list[rowIndex][columnIndex]}");`}
+        {`@import url("${selectedFamily.files[list[rowIndex][columnIndex]]}");`}
       </style>
     </FontOption>
   );
-  const list = fonts.map(f => [f.family]);
+  const list = selectedFamily.variants.map(v => [v]);
   return list && list[0] ? (
     <React.Fragment>
-      <Text>Select your font</Text>
+      <Text>Choose the right variant</Text>
       <Grid
         cellRenderer={cellRenderer}
         columnCount={list[0].length}
@@ -78,4 +80,4 @@ const SelectFont = ({ fonts = [], selected, onSelectFont }) => {
   ) : null;
 };
 
-export default SelectFont;
+export default SelectVariant;

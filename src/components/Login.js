@@ -16,29 +16,33 @@ const Img = styled('img')`
 
 const ActionButton = styled('button')`
   ${buttonDefault}
-  border: 2px solid ${colors.backgroundPrimaryLight};
+  border: 2px solid ${({ disabled }) => (disabled ? colors.disabled : colors.backgroundPrimaryLight)};
   border-radius: 5px;
   display: block;
   width: 100%;
-  color: ${colors.textPrimary};
+  color: ${({ disabled }) => (disabled ? colors.disabled : colors.textPrimary)};
   font-weight: bold;
   text-align: center;
   padding-top: 10px;
   padding-bottom: 10px;
-  
+  margin-bottom: 10px;
   font-size: 18px;
+  cursor: ${({ disabled }) => (disabled ? 'initial' : 'pointer')};
 
   svg {
     transform: translateY(1px);
     margin-right: 10px;
+    path {
+      fill: ${({ disabled }) => (disabled ? colors.disabled : colors.textPrimary)};
+    }
   }
 
   &:hover {
-    background: ${colors.backgroundPrimary};
-    color: ${colors.background};
+    background: ${({ disabled }) => (disabled ? colors.background : colors.backgroundPrimary)};
+    color: ${({ disabled }) => (disabled ? colors.disabled : colors.background)};
     svg {
       path {
-        fill: ${colors.background};
+        fill: ${({ disabled }) => (disabled ? colors.disabled : colors.background)};
       }
     }
   }
@@ -61,6 +65,14 @@ const Login = ({ onLogin }) => (
         />
       </svg>
       Google Fonts
+    </ActionButton>
+    <ActionButton
+      disabled
+    >
+      <svg width="17.28" height="16">
+        <path fill="#6558f5" d="M11.52 12.48v1.28H.32a.32.32 0 1 0 0 .64h11.2v1.28a.32.32 0 0 0 .32.32h3.84a.32.32 0 0 0 .32-.32V14.4h.96a.32.32 0 1 0 0-.64H16v-1.28a.32.32 0 0 0-.32-.32h-3.84a.32.32 0 0 0-.32.32zM6.4 6.4v1.28H.32a.32.32 0 1 0 0 .64H6.4V9.6a.32.32 0 0 0 .32.32h3.84a.32.32 0 0 0 .32-.32V8.32h6.08a.32.32 0 1 0 0-.64h-6.08V6.4a.32.32 0 0 0-.32-.32H6.72a.32.32 0 0 0-.32.32zM1.28.32V1.6H.32a.32.32 0 1 0 0 .64h.96v1.28a.32.32 0 0 0 .32.32h3.84a.32.32 0 0 0 .32-.32V2.24h11.2a.32.32 0 1 0 0-.64H5.76V.32A.32.32 0 0 0 5.44 0H1.6a.32.32 0 0 0-.32.32z"/>
+      </svg>
+      Custom fonts
     </ActionButton>
   </div>
 );

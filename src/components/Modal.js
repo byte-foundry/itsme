@@ -3,10 +3,10 @@ import styled from 'react-emotion';
 
 import Login from './Login';
 import SelectFont from './SelectFont';
+import SelectVariant from './SelectVariant';
 
-import {buttonDefault} from '../defaultStyles';
-import {colors} from '../variables';
-
+import { buttonDefault } from '../defaultStyles';
+import { colors } from '../variables';
 
 const Mask = styled('div')`
   position: absolute;
@@ -17,7 +17,6 @@ const Mask = styled('div')`
   bottom: 0;
   z-index: 10000000;
 `;
-
 
 const Popout = styled('div')`
   position: absolute;
@@ -42,7 +41,8 @@ const CloseButton = styled('button')`
   width: 20px;
   height: 20px;
 
-  &::before, &::after {
+  &::before,
+  &::after {
     content: '';
     position: absolute;
     height: 5px;
@@ -60,18 +60,42 @@ const CloseButton = styled('button')`
   }
 `;
 
+const ActionButton = styled('button')`
+  ${buttonDefault}
+  border: 2px solid ${({ disabled }) =>
+    disabled ? colors.disabled : colors.backgroundPrimaryLight};
+  border-radius: 5px;
+  display: block;
+  width: 100%;
+  color: ${({ disabled }) => (disabled ? colors.disabled : colors.textPrimary)};
+  font-weight: bold;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  cursor: ${({ disabled }) => (disabled ? 'initial' : 'pointer')};
+
+  &:hover {
+    background: ${({ disabled }) =>
+      disabled ? colors.background : colors.backgroundPrimary};
+    color: ${({ disabled }) =>
+      disabled ? colors.disabled : colors.background};
+  }
+`;
+
 const Title = styled('h1')`
   color: ${colors.text};
   margin-bottom: 5px;
   margin-top: 5px;
-`
+`;
 
 const SubTitle = styled('h3')`
   color: ${colors.textSecondary};
   font-style: italic;
   margin-top: 5px;
   font-weight: normal;
-`
+`;
 
 export default class Modal extends React.Component {
   constructor() {
@@ -81,36 +105,42 @@ export default class Modal extends React.Component {
       currentStep: 'login',
       fontList: [],
       selectedFont: null,
+      selectedVariant: null,
     };
   }
 
   async componentWillMount() {
     const fontListResponse = await fetch(
-      'https://www.googleapis.com/webfonts/v1/webfonts?fields=items%2Ffamily&key=AIzaSyAMYKtd8F3neG_z4FnkjhW1R6p24njPKLI'
+      'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyAMYKtd8F3neG_z4FnkjhW1R6p24njPKLI'
     );
-
     const fontList = await fontListResponse.json();
 
-    this.setState({ fontList: fontList.items.map(font => font.family) });
+    this.setState({ fontList: fontList.items });
   }
 
-  handleSelectFont = (font) => {
+  handleSelectFont = font => {
+    console.log(font)
     this.setState({ selectedFont: font });
-
     // TODO: update font on the server
-  }
+  };
+
+  handleSelectVariant = variant => {
+    console.log(variant)
+    this.setState({ selectedVariant: variant });
+    // TODO: update font on the server
+  };
 
   render() {
     const { close } = this.props;
-    const { currentStep, fontList, selectedFont } = this.state;
+    const { currentStep, fontList, selectedFont, selectedVariant } = this.state;
 
     return (
       <React.Fragment>
         <Mask onClick={close} />
         <Popout>
-            <CloseButton onClick={close}/>
-            <Title>It's Me</Title>
-            <SubTitle>Attach your identity to your emails.</SubTitle>
+          <CloseButton onClick={close} />
+          <Title>It's Me</Title>
+          <SubTitle>Attach your identity to your emails.</SubTitle>
           {/* Steps */}
           {currentStep === 'login' && (
             <Login
@@ -126,14 +156,42 @@ export default class Modal extends React.Component {
                 selected={selectedFont}
               />
               <div>
-                <button disabled={!selectedFont} onClick={() => this.setState({currentStep: 'confirm'})}>Next</button>
+                <ActionButton
+                  disabled={!selectedFont}
+                  onClick={() =>
+                    this.setState({
+                      currentStep:
+                        selectedFont.variants.length > 1
+                          ? 'selectVariant'
+                          : 'confirm',
+                    })
+                  }
+                >
+                  Next
+                </ActionButton>
               </div>
             </React.Fragment>
           )}
 
-          {currentStep === 'confirm' && (
-            <p>Good, now go use it!</p>
+          {currentStep === 'selectVariant' && (
+            <React.Fragment>
+              <SelectVariant
+                onSelectVariant={this.handleSelectVariant}
+                selected={selectedVariant}
+                selectedFamily={selectedFont}
+              />
+              <div>
+                <ActionButton
+                  disabled={!selectedVariant}
+                  onClick={() => this.setState({ currentStep: 'confirm' })}
+                >
+                  Next
+                </ActionButton>
+              </div>
+            </React.Fragment>
           )}
+
+          {currentStep === 'confirm' && <p>Good, now go use it!</p>}
         </Popout>
       </React.Fragment>
     );

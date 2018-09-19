@@ -9,13 +9,15 @@
   },
   "dependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "emotion": "^9.2.8",
     "parcel-bundler": "^1.9.7",
     "react": "^16.5.1",
     "react-dom": "^16.5.1",
-    "react-emotion": "^9.2.8"
+    "react-emotion": "^9.2.8",
+    "react-virtualized": "^9.20.1"
   },
   "browserslist": "last 2 chrome version, last 2 firefox version"
 }
