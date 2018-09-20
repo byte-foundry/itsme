@@ -17,8 +17,10 @@ const Text = styled('p')`
 `;
 
 const FontOption = styled('div')`
-  background: ${({ selected }) => (selected ? colors.backgroundPrimary : 'transparent')};
-  color: ${({ selected }) => (selected ? colors.background : colors.textSecondary)};
+  background: ${({ selected }) =>
+    selected ? colors.backgroundPrimary : 'transparent'};
+  color: ${({ selected }) =>
+    selected ? colors.background : colors.textSecondary};
   font-size: 20px;
   margin-top: 5px;
   margin-bottom: 5px;
@@ -33,38 +35,105 @@ const FontOption = styled('div')`
   }
 `;
 
-const SelectFont = ({ fonts = [], selected, onSelectFont }) => {
-  const cellRenderer = ({ columnIndex, key, rowIndex, style }) => ( 
-    <FontOption
-      key={key}
-      name={list[rowIndex][columnIndex]} selected={selected && (list[rowIndex][columnIndex] === selected.family)}
-      onClick={() => onSelectFont(fonts.find(f => f.family === list[rowIndex][columnIndex]))}
-      style={{
-        ...style,
-        fontFamily: `${list[rowIndex][columnIndex]}, sans-serif`,
-      }}
-    >
-      {list[rowIndex][columnIndex]}
-      <style>
-        {`@import url("https://fonts.googleapis.com/css?family=${list[rowIndex][columnIndex]}");`}
-      </style>
-    </FontOption>
-  );
-  const list = fonts.map(f => [f.family]);
-  return list && list[0] ? (
-    <React.Fragment>
-      <Text>Select your font</Text>
-      <Grid
-        cellRenderer={cellRenderer}
-        columnCount={list[0].length}
-        columnWidth={325}
-        height={window.innerHeight - 314}
-        rowCount={list.length}
-        rowHeight={57}
-        width={345}
-        style={{marginBottom: '20px', outline: 'none'}}
-      />
-      {/* <FontSelect>
+const Filters = styled('div')`
+  ::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+  padding-top: 10px;
+  padding-bottom: 10px;
+`;
+
+const Filter = styled('span')`
+  float: left;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid ${colors.backgroundPrimary};
+  cursor: pointer;
+  transition: all .2s ease;
+  background: ${({ active }) =>
+    active ? colors.backgroundPrimary : 'transparent'};
+  color: ${({ active }) =>
+    active ? colors.background : colors.textPrimary};
+  :hover {
+    background: ${colors.backgroundPrimaryLight};
+    color: ${colors.background};
+  }
+`;
+
+class SelectFont extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filter: 'all',
+      list: this.props.fonts.map(f => [f.family]),
+    };
+  }
+  filterList = category => {
+    const newList =
+      category === 'all'
+        ? this.props.fonts.map(f => [f.family])
+        : this.props.fonts
+            .filter(f => f.category === category)
+            .map(f => [f.family]);
+    this.setState({ filter: category, list: newList });
+  };
+  render() {
+    const { fonts = [], selected, onSelectFont } = this.props;
+    const { list } = this.state;
+    const cellRenderer = ({ columnIndex, key, rowIndex, style }) => (
+      <FontOption
+        key={key}
+        name={list[rowIndex][columnIndex]}
+        selected={selected && list[rowIndex][columnIndex] === selected.family}
+        onClick={() =>
+          onSelectFont(
+            fonts.find(f => f.family === list[rowIndex][columnIndex])
+          )
+        }
+        style={{
+          ...style,
+          fontFamily: `${list[rowIndex][columnIndex]}, sans-serif`,
+        }}
+      >
+        {list[rowIndex][columnIndex]}
+        <style>
+          {`@import url("https://fonts.googleapis.com/css?family=${
+            list[rowIndex][columnIndex]
+          }");`}
+        </style>
+      </FontOption>
+    );
+    return this.state.list && this.state.list[0] ? (
+      <React.Fragment>
+        <Text>Select your font</Text>
+        <Filters>
+          {this.props.categories.map(category => (
+            <Filter
+              onClick={() => {
+                this.filterList(category);
+              }}
+              active={this.state.filter === category}
+            >
+              {category}
+            </Filter>
+          ))}
+        </Filters>
+        <Grid
+          cellRenderer={cellRenderer}
+          columnCount={list[0].length}
+          columnWidth={325}
+          height={window.innerHeight - 314}
+          rowCount={list.length}
+          rowHeight={57}
+          width={345}
+          style={{ marginBottom: '20px', outline: 'none' }}
+        />
+        {/* <FontSelect>
         {fonts.map((font) => (
           <FontOption  style={{fontFamily: font.family}}>
             <style>
@@ -74,8 +143,9 @@ const SelectFont = ({ fonts = [], selected, onSelectFont }) => {
           </FontOption>
         ))}
       </FontSelect> */}
-    </React.Fragment>
-  ) : null;
-};
+      </React.Fragment>
+    ) : null;
+  }
+}
 
 export default SelectFont;

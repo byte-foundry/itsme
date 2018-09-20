@@ -114,8 +114,11 @@ export default class Modal extends React.Component {
       'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyAMYKtd8F3neG_z4FnkjhW1R6p24njPKLI'
     );
     const fontList = await fontListResponse.json();
-
-    this.setState({ fontList: fontList.items });
+    console.log(fontList)
+    const categories = [...new Set(fontList.items.map(item => item.category))]
+    console.log(categories);
+    categories.unshift('all');
+    this.setState({ fontList: fontList.items, categories });
   }
 
   handleSelectFont = font => {
@@ -132,7 +135,7 @@ export default class Modal extends React.Component {
 
   render() {
     const { close } = this.props;
-    const { currentStep, fontList, selectedFont, selectedVariant } = this.state;
+    const { currentStep, fontList, selectedFont, selectedVariant, categories } = this.state;
 
     return (
       <React.Fragment>
@@ -154,6 +157,7 @@ export default class Modal extends React.Component {
                 fonts={fontList}
                 onSelectFont={this.handleSelectFont}
                 selected={selectedFont}
+                categories={categories}
               />
               <div>
                 <ActionButton
