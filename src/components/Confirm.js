@@ -4,7 +4,7 @@ import styled from 'react-emotion';
 import { textDefault } from '../defaultStyles';
 import { colors } from '../variables';
 
-import placeholderImage from '../../images/placeholder.png';
+import sampleImage from '../../images/sample.png';
 
 
 const Title = styled('h1')`
@@ -34,6 +34,7 @@ const Text = styled('p')`
 const Img = styled('img')`
   width: 100%;
   height: auto;
+  margin-top: 20px;
   margin-bottom: 30px;
 `;
 
@@ -100,7 +101,7 @@ const Confirm = () => {
       <Text>We will add a small text banner at the top of your emails for those without the extension.</Text>
       <Text>It should look like this:</Text>
       <Img
-        src={chrome.runtime.getURL(placeholderImage)}
+        src={chrome.runtime.getURL(sampleImage)}
         alt="placeholder image"
       />
     </React.Fragment>
