@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import styled from 'react-emotion';
 
 import createComposerObserver from '../observers/composer';
+import createThreadObserver from '../observers/thread';
 import Modal from './Modal';
 
 import { buttonDefault } from '../defaultStyles';
@@ -31,6 +32,7 @@ export default class App extends React.Component {
     this.modalRoot = document.createElement('div');
 
     this.composerObserver = createComposerObserver('customFont');
+    this.threadObserver = createThreadObserver();
 
     this.state = {
       isOpen: false,
@@ -40,12 +42,14 @@ export default class App extends React.Component {
 
   componentDidMount() {
     this.composerObserver.observe();
+    this.threadObserver.observe();
 
     document.body.appendChild(this.modalRoot);
   }
 
   componentWillUnmount() {
     this.composerObserver.disconnect();
+    this.threadObserver.disconnect();
 
     document.body.removeChild(this.modalRoot);
   }
