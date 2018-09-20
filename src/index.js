@@ -14,6 +14,7 @@ const observer = new MutationObserver((mutationsList) => {
 
       // Gmail action bar on top of the page
       // Since it's a specific class, it might change in the future
+      // like everything
       const actions = document.querySelector('.gb_Dc.gb_jb.gb_Cc.gb_7d');
 
       // Adding the app into the menu bar

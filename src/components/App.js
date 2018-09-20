@@ -41,6 +41,15 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+    // Script to get the user email from the config
+    const s = document.createElement('script');
+    s.setAttribute('src', chrome.runtime.getURL('js/emailDetector.js'));
+    document.body.appendChild(s);
+    // Script for Google Auth
+    const s2 = document.createElement('script');
+    s2.setAttribute('src', 'https://apis.google.com/js/api:client.js');
+    document.body.appendChild(s2);
+
     this.composerObserver.observe();
     this.threadObserver.observe();
 
