@@ -4,6 +4,7 @@ import styled from 'react-emotion';
 
 import Modal from './Modal';
 
+import createComposerObserver from '../observers/composer';
 import {buttonDefault} from '../defaultStyles';
 
 const Button = styled('button')`
@@ -16,16 +17,22 @@ export default class App extends React.Component {
 
     this.modalRoot = document.createElement('div');
 
+    this.composerObserver = createComposerObserver('customFont');
+
     this.state = {
       isOpen: false,
     };
   }
 
   componentDidMount() {
+    this.composerObserver.observe();
+
     document.body.appendChild(this.modalRoot);
   }
 
   componentWillUnmount() {
+    this.composerObserver.disconnect();
+
     document.body.removeChild(this.modalRoot);
   }
 
