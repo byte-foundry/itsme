@@ -4,6 +4,8 @@ import styled from 'react-emotion';
 import { textDefault } from '../defaultStyles';
 import { colors } from '../variables';
 
+import placeholderImage from '../../images/placeholder.png';
+
 
 const Title = styled('h1')`
   color: ${colors.textPrimary};
@@ -27,6 +29,12 @@ const Text = styled('p')`
   margin-bottom: 10px;
   margin-top: 10px;
   font-size: 18px;
+`;
+
+const Img = styled('img')`
+  width: 100%;
+  height: auto;
+  margin-bottom: 30px;
 `;
 
 const CustomCheckbox = styled('span')`
@@ -78,8 +86,9 @@ const Confirm = () => {
     <React.Fragment>
       <Title>Almost done!</Title>
       <Text>In order to allow your contacts to see your bespoke font, we need them to install it's me.</Text>
-      <Subtitle>How do you want to notify them?</Subtitle>
-      <p style={{marginTop: '10px', marginBottom: '30px'}}>
+      {/* <Subtitle>How do you want to notify them?</Subtitle> */}
+      <Subtitle>How will they be notified?</Subtitle>
+      {/* <p style={{marginTop: '10px', marginBottom: '30px'}}>
         <CustomCheckbox disabled>
           <input type="checkbox" id="custom-checkbox" checked disabled/>
           <label htmlFor="custom-checkbox">
@@ -87,7 +96,13 @@ const Confirm = () => {
           </label>
         </CustomCheckbox>
         <Option>Add a small banner in my emails</Option>
-      </p>
+      </p> */}
+      <Text>We will add a small text banner at the top of your emails for those without the extension.</Text>
+      <Text>It should look like this:</Text>
+      <Img
+        src={chrome.runtime.getURL(placeholderImage)}
+        alt="placeholder image"
+      />
     </React.Fragment>
   );
 };
