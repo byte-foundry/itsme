@@ -17,8 +17,10 @@ const Text = styled('p')`
 `;
 
 const FontOption = styled('div')`
-  background: ${({ selected }) => (selected ? colors.backgroundPrimary : 'transparent')};
-  color: ${({ selected }) => (selected ? colors.background : colors.textSecondary)};
+  background: ${({ selected }) =>
+    selected ? colors.backgroundPrimary : 'transparent'};
+  color: ${({ selected }) =>
+    selected ? colors.background : colors.textSecondary};
   font-size: 20px;
   margin-top: 5px;
   margin-bottom: 5px;
@@ -33,51 +35,94 @@ const FontOption = styled('div')`
   }
 `;
 
-const SelectVariant = ({ selected, onSelectVariant, selectedFamily }) => {
-  const cellRenderer = ({ columnIndex, key, rowIndex, style }) => ( 
-    <FontOption
-      key={key}
-      name={list[rowIndex][columnIndex]} selected={selected && (list[rowIndex][columnIndex] === selected)}
-      onClick={() => onSelectVariant(list[rowIndex][columnIndex])}
-      style={{
-        ...style,
-        fontFamily: `${selectedFamily.family}, sans-serif`,
-        fontWeight: list[rowIndex][columnIndex].split('italic')[0],
-        fontStyle: list[rowIndex][columnIndex].split('italic').length > 1 ? 'italic' : 'normal',
-      }}
-    >
-      {selectedFamily.family} {list[rowIndex][columnIndex]}
-      <style>
-        {`@import url("${selectedFamily.files[list[rowIndex][columnIndex]]}");`}
-      </style>
-    </FontOption>
-  );
-  const list = selectedFamily.variants.map(v => [v]);
-  return list && list[0] ? (
-    <React.Fragment>
-      <Text>Choose the right variant</Text>
-      <Grid
-        cellRenderer={cellRenderer}
-        columnCount={list[0].length}
-        columnWidth={325}
-        height={window.innerHeight - 314}
-        rowCount={list.length}
-        rowHeight={57}
-        width={345}
-        style={{marginBottom: '20px', outline: 'none'}}
-      />
-      {/* <FontSelect>
-        {fonts.map((font) => (
-          <FontOption  style={{fontFamily: font.family}}>
-            <style>
-              {`@import url("https://fonts.googleapis.com/css?family=${font.family}");`}
-            </style>
-            {font.family}
-          </FontOption>
-        ))}
-      </FontSelect> */}
-    </React.Fragment>
-  ) : null;
-};
+class SelectVariant extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedRegular: null,
+      selectedItalic: null,
+      selectedBold: null,
+    };
+  }
+  render() {
+    const { onSelectVariant, selectedFamily } = this.props;
+    const { selectedRegular, selectedItalic, selectedBold } = this.state;
+    const regularList = selectedFamily.variants.filter(
+      v =>
+        v.split('italic').length === 1 &&
+        (v === 'regular' || parseInt(v.split('italic')[0]) < 600)
+    );
+    const italicList = selectedFamily.variants.filter(v =>
+      v.includes('italic')
+    );
+    const boldList = selectedFamily.variants.filter(
+      v =>
+        v.split('italic').length === 1 && parseInt(v.split('italic')[0]) > 500
+    );
+
+    const getVariantStyle = variant => ({
+      fontFamily: `${selectedFamily.family}, sans-serif`,
+      fontWeight: variant.split('italic')[0],
+      fontStyle: variant.split('italic').length > 1 ? 'italic' : 'normal',
+    });
+
+    return (
+      <React.Fragment>
+        <Text>Choose your regular, bold and italic</Text>
+        <h4>Regular</h4>
+        <FontSelect>
+          {regularList.map(variant => (
+            <FontOption
+              key={variant}
+              name={variant}
+              selected={selectedRegular && variant === selectedRegular}
+              onClick={() => this.setState({ selectedRegular: variant })}
+              style={getVariantStyle(variant)}
+            >
+              {selectedFamily.family} {variant}
+              <style>
+                {`@import url("${selectedFamily.files[variant]}");`}
+              </style>
+            </FontOption>
+          ))}
+        </FontSelect>
+        <h4>Italic</h4>
+        <FontSelect>
+          {italicList.map(variant => (
+            <FontOption
+              key={variant}
+              name={variant}
+              selected={selectedItalic && variant === selectedItalic}
+              onClick={() => this.setState({ selectedItalic: variant })}
+              style={getVariantStyle(variant)}
+            >
+              {selectedFamily.family} {variant}
+              <style>
+                {`@import url("${selectedFamily.files[variant]}");`}
+              </style>
+            </FontOption>
+          ))}
+        </FontSelect>
+        <h4>Bold</h4>
+        <FontSelect>
+          {boldList.map(variant => (
+            <FontOption
+              key={variant}
+              name={variant}
+              selected={selectedBold && variant === selectedBold}
+              onClick={() => this.setState({ selectedBold: variant })}
+              style={getVariantStyle(variant)}
+            >
+              {selectedFamily.family} {variant}
+              <style>
+                {`@import url("${selectedFamily.files[variant]}");`}
+              </style>
+            </FontOption>
+          ))}
+        </FontSelect>
+      </React.Fragment>
+    );
+  }
+}
 
 export default SelectVariant;

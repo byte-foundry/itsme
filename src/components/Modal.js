@@ -114,28 +114,44 @@ export default class Modal extends React.Component {
       'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyAMYKtd8F3neG_z4FnkjhW1R6p24njPKLI'
     );
     const fontList = await fontListResponse.json();
-    console.log(fontList)
-    const categories = [...new Set(fontList.items.map(item => item.category))]
-    console.log(categories);
+    // filter font list :
+    // - At least a regular
+    // - At least an italic
+    // - At least a bold
+    const filteredFonts = fontList.items.filter(
+      family =>
+        family.variants.find(v => v === 'regular') &&
+        family.variants.find(v => v.includes('italic')) &&
+        family.variants.find(v => parseInt(v.split('italic')[0]) > 500)
+    );
+    console.log(filteredFonts);
+    // get categories
+    const categories = [...new Set(filteredFonts.map(item => item.category))];
     categories.unshift('all');
-    this.setState({ fontList: fontList.items, categories });
+    this.setState({ fontList: filteredFonts, categories });
   }
 
   handleSelectFont = font => {
-    console.log(font)
+    console.log(font);
     this.setState({ selectedFont: font });
     // TODO: update font on the server
   };
 
   handleSelectVariant = variant => {
-    console.log(variant)
+    console.log(variant);
     this.setState({ selectedVariant: variant });
     // TODO: update font on the server
   };
 
   render() {
     const { close } = this.props;
-    const { currentStep, fontList, selectedFont, selectedVariant, categories } = this.state;
+    const {
+      currentStep,
+      fontList,
+      selectedFont,
+      selectedVariant,
+      categories,
+    } = this.state;
 
     return (
       <React.Fragment>
@@ -163,11 +179,14 @@ export default class Modal extends React.Component {
                 <ActionButton
                   disabled={!selectedFont}
                   onClick={() =>
+                    // this.setState({
+                    //   currentStep:
+                    //     selectedFont.variants.length > 1
+                    //       ? 'selectVariant'
+                    //       : 'confirm',
+                    // })
                     this.setState({
-                      currentStep:
-                        selectedFont.variants.length > 1
-                          ? 'selectVariant'
-                          : 'confirm',
+                      currentStep: 'confirm'
                     })
                   }
                 >
@@ -176,8 +195,9 @@ export default class Modal extends React.Component {
               </div>
             </React.Fragment>
           )}
-
-          {currentStep === 'selectVariant' && (
+          
+          {// drafted idea: when choosing a family, select which bold, italic, regular to use}
+          {/* {currentStep === 'selectVariant' && (
             <React.Fragment>
               <SelectVariant
                 onSelectVariant={this.handleSelectVariant}
@@ -193,7 +213,7 @@ export default class Modal extends React.Component {
                 </ActionButton>
               </div>
             </React.Fragment>
-          )}
+          )} */}
 
           {currentStep === 'confirm' && <p>Good, now go use it!</p>}
         </Popout>
