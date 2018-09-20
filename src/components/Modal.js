@@ -4,6 +4,7 @@ import styled from 'react-emotion';
 import Login from './Login';
 import SelectFont from './SelectFont';
 import SelectVariant from './SelectVariant';
+import Confirm from './Confirm';
 
 import { buttonDefault } from '../defaultStyles';
 import { colors } from '../variables';
@@ -124,7 +125,6 @@ export default class Modal extends React.Component {
         family.variants.find(v => v.includes('italic')) &&
         family.variants.find(v => parseInt(v.split('italic')[0]) > 500)
     );
-    console.log(filteredFonts);
     // get categories
     const categories = [...new Set(filteredFonts.map(item => item.category))];
     categories.unshift('all');
@@ -132,16 +132,35 @@ export default class Modal extends React.Component {
   }
 
   handleSelectFont = font => {
-    console.log(font);
     this.setState({ selectedFont: font });
     // TODO: update font on the server
   };
 
-  handleSelectVariant = variant => {
-    console.log(variant);
-    this.setState({ selectedVariant: variant });
-    // TODO: update font on the server
-  };
+  storeSelectedFont = () => {
+    const font = this.state.selectedFont;
+    const selectedRegular = font.variants.find(v => v === 'regular') || font.variants.find(
+      v =>( v.split('italic').length === 1 && ( parseInt(v.split('italic')[0]) > 300 && parseInt(v.split('italic')[0]) < 600) )
+    );
+    const selectedItalic = font.variants.find(v => v === 'italic') || font.variants.find(
+      v => v.includes('italic')
+    );
+    const selectedBold = font.variants.find(
+      v =>
+        v.split('italic').length === 1 && parseInt(v.split('italic')[0]) > 600
+    );
+    const selectedBoldItalic = font.variants.find(
+      v =>
+        v.split('italic').length > 1 && parseInt(v.split('italic')[0]) > 600
+    );
+
+    this.props.storeFamily({
+      name: font.family,
+      regular: font.files[selectedRegular],
+      italic: font.files[selectedItalic],
+      bold: font.files[selectedBold],
+      boldItalic: font.files[selectedBoldItalic]
+    });
+  }
 
   render() {
     const { close } = this.props;
@@ -196,7 +215,7 @@ export default class Modal extends React.Component {
             </React.Fragment>
           )}
           
-          {// drafted idea: when choosing a family, select which bold, italic, regular to use}
+          {/* drafted idea: when choosing a family, select which bold, italic, regular to use */}
           {/* {currentStep === 'selectVariant' && (
             <React.Fragment>
               <SelectVariant
@@ -215,7 +234,22 @@ export default class Modal extends React.Component {
             </React.Fragment>
           )} */}
 
-          {currentStep === 'confirm' && <p>Good, now go use it!</p>}
+          {currentStep === 'confirm' && (
+            <React.Fragment>
+              <Confirm/>
+              <div>
+                <ActionButton
+                  disabled={false}
+                  onClick={() => {
+                    this.storeSelectedFont();
+                    close();
+                  }}
+                >
+                  Start using my font now
+                </ActionButton>
+              </div>
+            </React.Fragment>
+          )}
         </Popout>
       </React.Fragment>
     );
