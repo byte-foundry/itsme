@@ -67,6 +67,7 @@ export default function createComposerUpdater(userFont) {
 
   // observe if the composer has been updated (e.g. text has been added)
   function observeComposerChanges(composer) {
+    //TODO : Stop listening if composer closed
     const contentChangedCallback = mutations => {
       console.log('Changes for the composer', mutations);
 
@@ -88,7 +89,7 @@ export default function createComposerUpdater(userFont) {
   }
 
   const updateComposerIfPresent = (container = document) => {
-    const composer = container.querySelector('[contenteditable]');
+    const composer = container.querySelector('[contenteditable="true"]');
 
     if (!composer) {
       console.warn(
@@ -96,9 +97,10 @@ export default function createComposerUpdater(userFont) {
       );
       return;
     } else {
+      console.log('composer found');
       const extensionBanner = document.createElement('div');
       extensionBanner.innerHTML =
-        '<div class="itsmeextension"><hr/><font face="arial, helvetica, sans-serif" color="#000000">I send emails with a bespoke font. <u>Click here to display it!</u></font></div>';
+        '<div lang="itsmebanner"><hr/><font face="arial, helvetica, sans-serif" color="#000000">I send emails with a bespoke font. <u>Click here to display it!</u></font></div>';
 
       composer.addEventListener('keydown', e => {
         console.log('keydown');
@@ -124,6 +126,7 @@ export default function createComposerUpdater(userFont) {
   return {
     // Observe if the text editor panel has been open
     observe() {
+      console.log('hello there');
       // Composer response container .ip
       // Opened: .adB
       // Closed: .iq
@@ -144,46 +147,77 @@ export default function createComposerUpdater(userFont) {
         updateComposerIfPresent(responseComposerContainer);
       }
 
-      let bodyObserver;
+      const openedComposers = [];
+
+      const onComposerFound = (composer, obs) => {
+        // Run an observer to know when the composer is closed
+        const observer = new MutationObserver(() => {
+          openedComposers.splice(openedComposers.indexOf(composer), 1);
+        });
+        observer.observe(composer, {
+          childList: true,
+        });
+        observers.push(observer);
+        
+        // Update composer
+        updateComposerIfPresent(composer);
+      };
+
 
       // Watching when the container is going to be inserted
       const bodyCallback = () => {
         // create new mail composers
         const createComposerContainer = document.querySelector('.dw .no');
-
-        if (createComposerContainer) {
-          bodyObserver.disconnect();
-          if (observers.includes(bodyObserver))
-            observers.splice(observers.indexOf(bodyObserver), 1);
-          console.log('started watch create composer container');
-
-          const callback = mutations => {
-            for (const mutation of mutations) {
-              for (const node of mutation.addedNodes) {
-                updateComposerIfPresent(node);
-              }
-
-              // TODO: removal
-            }
-          };
-          const observer = new MutationObserver(callback);
-          observer.observe(createComposerContainer, {
-            childList: true,
-          });
-          observers.push(observer);
-
-          updateComposerIfPresent(createComposerContainer);
+        const threadComposerContainers = document.querySelectorAll('.ip');
+        let threadComposerContainer = null;
+        threadComposerContainers.forEach(t => {
+          if (t.querySelector('[contenteditable="true"]') && !openedComposers.find(c => c === t)) {
+            threadComposerContainer = t;
+          }
+        });
+        if (
+          createComposerContainer !== null &&
+          createComposerContainer.querySelector('[contenteditable="true"]') &&
+          !openedComposers.find(c => c === createComposerContainer)
+        ) {
+          openedComposers.push(createComposerContainer);
+          onComposerFound(createComposerContainer, this);
+        } else if (
+          threadComposerContainer !== null &&
+          threadComposerContainer.querySelector('[contenteditable="true"]') &&
+          !openedComposers.find(c => c === threadComposerContainer)
+        ) {
+          openedComposers.push(threadComposerContainer);
+          onComposerFound(threadComposerContainer, this);
         }
       };
 
-      bodyObserver = new MutationObserver(bodyCallback);
-      bodyObserver.observe(document.body, {
-        childList: true,
+      
+
+      const runBodyObserver = () => {
+        let bodyObserver = new MutationObserver(bodyCallback);
+        bodyObserver.observe(document.body, {
+          childList: true,
+          attributes: true,
+          subtree: true,
+        });
+        observers.push(bodyObserver);
+      }
+
+      
+
+      window.addEventListener('hashchange', () => {
+        console.log('hashchange')
+        if (/(inbox|sent)\/[a-zA-Z0-9]+/.test(window.location)) {
+          runBodyObserver();
+        }
       });
-      observers.push(bodyObserver);
+
+      runBodyObserver();
     },
 
     disconnect() {
+      console.log('disconnecting');
       observers.forEach(o => o.disconnect());
     },
   };

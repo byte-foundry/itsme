@@ -21,17 +21,8 @@ const updateRow = (row, font) => {
   const previewDiv = row.querySelector('.adf.ads');
   if (previewDiv && previewDiv.style.display === 'none') {
     // Complete email
-    const completeEmailFirstParagraph = row.querySelector('.aXjCH');
-    if (
-      completeEmailFirstParagraph &&
-      completeEmailFirstParagraph.firstChild &&
-      completeEmailFirstParagraph.firstChild.firstChild &&
-      completeEmailFirstParagraph.firstChild.innerText.includes(
-        'I send emails with a bespoke font.'
-      )
-    ) {
-      completeEmailFirstParagraph.style.display = 'none';
-    }
+    const allBanners = row.querySelectorAll('[lang="itsmebanner"]');
+    allBanners.forEach(banner => banner.style.display = 'none')
     return;
   }
 
