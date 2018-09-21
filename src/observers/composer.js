@@ -95,6 +95,17 @@ export default function createComposerUpdater(userFont) {
         'The node of the composer has not been found (looking for the contenteditable)'
       );
       return;
+    } else {
+      const extensionBanner = document.createElement('div');
+        extensionBanner.innerHTML = '<hr/><span style="font-size:large"><font face="arial, helvetica, sans-serif" color="#000000">I send emails with a bespoke font. <u>Click here to display it!</u></font></span>';
+        
+        composer.addEventListener('keydown', (e) => {
+          console.log('keydown')
+          if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13 || e.keyCode == 10)) {
+            console.log('mail sent!')
+            composer.insertBefore(extensionBanner, composer.firstChild);
+          }
+        });
     }
 
     observeComposerChanges(composer);
@@ -122,7 +133,6 @@ export default function createComposerUpdater(userFont) {
           attributes: true,
         });
         observers.push(observer);
-
         updateComposerIfPresent(responseComposerContainer);
       }
 
