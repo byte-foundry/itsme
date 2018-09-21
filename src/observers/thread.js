@@ -3,12 +3,13 @@
 const observers = [];
 
 const updateRow = (row, font) => {
+  //Closed row
   if (!font) {
     return;
   }
 
   const mailContents = Array.from(row.querySelectorAll('.iA.g6')).concat(
-    Array.from(row.querySelectorAll('.ii.gt.adP.adO'))
+    Array.from(row.querySelectorAll('.ii.gt'))
   );
 
   if (!mailContents.length) {
@@ -19,17 +20,46 @@ const updateRow = (row, font) => {
   // We want to inject fonts only on the preview (not the complete mail)
   const previewDiv = row.querySelector('.adf.ads');
   if (previewDiv && previewDiv.style.display === 'none') {
+    // Complete email
+    const completeEmailFirstParagraph = row.querySelector('.aXjCH');
+    if (
+      completeEmailFirstParagraph &&
+      completeEmailFirstParagraph.firstChild &&
+      completeEmailFirstParagraph.firstChild.firstChild &&
+      completeEmailFirstParagraph.firstChild.innerText.includes(
+        'I send emails with a bespoke font.'
+      )
+    ) {
+      completeEmailFirstParagraph.style.display = 'none';
+    }
     return;
   }
 
   mailContents.forEach(node => {
+    // Folded email
     node.style.fontFamily = font;
+    node.innerText = node.innerText.replace(
+      'I send emails with a bespoke font. Click here to display it!',
+      ''
+    );
   });
 };
 
 const observeConversation = ({ newURL }) => {
   // Detect URL of a conversation on Gmail
   if (!/(inbox|sent)\/[a-zA-Z0-9]+/.test(newURL)) {
+    if (/(inbox|sent)/.test(newURL)) {
+      // Strip extension headers from sent - inbox list
+      Array.from(document.querySelectorAll('[draggable="true"]')).forEach(
+        row => {
+          const rowText = row.querySelector('.y2');
+          rowText.innerText = rowText.innerText.replace(
+            'I send emails with a bespoke font. Click here to display it!',
+            ''
+          );
+        }
+      );
+    }
     return;
   }
 
@@ -50,7 +80,9 @@ const observeConversation = ({ newURL }) => {
   });
 
   // observe when new rows appear
-  const mailList = document.querySelector('[role=list]');
+  // folded: kv
+  // full: h7
+  const mailList = document.querySelector('[role=list]:not(.brd)');
   const observer = new MutationObserver(mutations => {
     mutations.forEach(async mutation => {
       if (

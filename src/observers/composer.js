@@ -97,14 +97,22 @@ export default function createComposerUpdater(userFont) {
       return;
     } else {
       const extensionBanner = document.createElement('div');
-        extensionBanner.innerHTML = '<hr/><span style="font-size:large"><font face="arial, helvetica, sans-serif" color="#000000">I send emails with a bespoke font. <u>Click here to display it!</u></font></span>';
-        
-        composer.addEventListener('keydown', (e) => {
-          console.log('keydown')
-          if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13 || e.keyCode == 10)) {
-            console.log('mail sent!')
-            composer.insertBefore(extensionBanner, composer.firstChild);
-          }
+      extensionBanner.innerHTML =
+        '<div class="itsmeextension"><hr/><font face="arial, helvetica, sans-serif" color="#000000">I send emails with a bespoke font. <u>Click here to display it!</u></font></div>';
+
+      composer.addEventListener('keydown', e => {
+        console.log('keydown');
+        if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13 || e.keyCode == 10)) {
+          console.log('mail sent!');
+          composer.insertBefore(extensionBanner, composer.firstChild);
+        }
+      });
+      container
+        .querySelector('.T-I.J-J5-Ji.aoO.T-I-atl.L3')
+        .addEventListener('mousedown', e => {
+          console.log('click');
+          console.log('mail sent!');
+          composer.insertBefore(extensionBanner, composer.firstChild);
         });
     }
 
