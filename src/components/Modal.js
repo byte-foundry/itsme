@@ -8,6 +8,7 @@ import Confirm from './Confirm';
 
 import { buttonDefault } from '../defaultStyles';
 import { colors } from '../variables';
+import ChooseFontOrigin from './ChooseFontOrigin';
 
 const Mask = styled('div')`
   position: absolute;
@@ -99,13 +100,13 @@ const SubTitle = styled('h3')`
 `;
 
 export default class Modal extends React.Component {
-  constructor() {
+  constructor(props) {
     super();
 
     this.state = {
-      currentStep: 'login',
+      currentStep: 'selectFontOrigin',
       fontList: [],
-      selectedFont: null,
+      selectedFont: (props.selectedFamily && props.selectedFamily.name) || null,
       selectedVariant: null,
     };
   }
@@ -133,24 +134,27 @@ export default class Modal extends React.Component {
 
   handleSelectFont = font => {
     this.setState({ selectedFont: font });
-    // TODO: update font on the server
   };
 
   storeSelectedFont = () => {
     const font = this.state.selectedFont;
-    const selectedRegular = font.variants.find(v => v === 'regular') || font.variants.find(
-      v =>( v.split('italic').length === 1 && ( parseInt(v.split('italic')[0]) > 300 && parseInt(v.split('italic')[0]) < 600) )
-    );
-    const selectedItalic = font.variants.find(v => v === 'italic') || font.variants.find(
-      v => v.includes('italic')
-    );
+    const selectedRegular =
+      font.variants.find(v => v === 'regular') ||
+      font.variants.find(
+        v =>
+          v.split('italic').length === 1 &&
+          (parseInt(v.split('italic')[0]) > 300 &&
+            parseInt(v.split('italic')[0]) < 600)
+      );
+    const selectedItalic =
+      font.variants.find(v => v === 'italic') ||
+      font.variants.find(v => v.includes('italic'));
     const selectedBold = font.variants.find(
       v =>
         v.split('italic').length === 1 && parseInt(v.split('italic')[0]) > 600
     );
     const selectedBoldItalic = font.variants.find(
-      v =>
-        v.split('italic').length > 1 && parseInt(v.split('italic')[0]) > 600
+      v => v.split('italic').length > 1 && parseInt(v.split('italic')[0]) > 600
     );
 
     this.props.storeFamily({
@@ -158,12 +162,12 @@ export default class Modal extends React.Component {
       regular: font.files[selectedRegular],
       italic: font.files[selectedItalic],
       bold: font.files[selectedBold],
-      boldItalic: font.files[selectedBoldItalic]
+      boldItalic: font.files[selectedBoldItalic],
     });
-  }
+  };
 
   render() {
-    const { close } = this.props;
+    const { email, needLogin, onLogin, close } = this.props;
     const {
       currentStep,
       fontList,
@@ -180,43 +184,57 @@ export default class Modal extends React.Component {
           <Title>It's Me</Title>
           <SubTitle>Attach your identity to your emails.</SubTitle>
           {/* Steps */}
-          {currentStep === 'login' && (
+          {needLogin && (
             <Login
-              onLogin={() => this.setState({ currentStep: 'selectFont' })}
+              onLogin={(data) => {
+                console.log('Modal received login infos', data);
+                onLogin(data);
+                this.setState({ currentStep: 'selectFontOrigin' });
+              }}
             />
           )}
 
-          {currentStep === 'selectFont' && (
-            <React.Fragment>
-              <SelectFont
-                fonts={fontList}
-                onSelectFont={this.handleSelectFont}
-                selected={selectedFont}
-                categories={categories}
+          {!needLogin &&
+            currentStep === 'selectFontOrigin' && (
+              <ChooseFontOrigin
+                onChoose={fontType =>
+                  this.setState({ currentStep: 'selectFont' })
+                }
               />
-              <div>
-                <ActionButton
-                  disabled={!selectedFont}
-                  onClick={() =>
-                    // this.setState({
-                    //   currentStep:
-                    //     selectedFont.variants.length > 1
-                    //       ? 'selectVariant'
-                    //       : 'confirm',
-                    // })
-                    this.setState({
-                      currentStep: 'confirm'
-                    })
-                  }
-                >
-                  Next
-                </ActionButton>
-              </div>
-            </React.Fragment>
-          )}
-          
+            )}
+
+          {!needLogin &&
+            currentStep === 'selectFont' && (
+              <React.Fragment>
+                <SelectFont
+                  fonts={fontList}
+                  onSelectFont={this.handleSelectFont}
+                  selected={selectedFont}
+                  categories={categories}
+                />
+                <div>
+                  <ActionButton
+                    disabled={!selectedFont}
+                    onClick={() =>
+                      // this.setState({
+                      //   currentStep:
+                      //     selectedFont.variants.length > 1
+                      //       ? 'selectVariant'
+                      //       : 'confirm',
+                      // })
+                      this.setState({
+                        currentStep: 'confirm',
+                      })
+                    }
+                  >
+                    Next
+                  </ActionButton>
+                </div>
+              </React.Fragment>
+            )}
+
           {/* drafted idea: when choosing a family, select which bold, italic, regular to use */}
-          {/* {currentStep === 'selectVariant' && (
+          {/* {!needLogin && currentStep === 'selectVariant' && (
             <React.Fragment>
               <SelectVariant
                 onSelectVariant={this.handleSelectVariant}
@@ -234,22 +252,23 @@ export default class Modal extends React.Component {
             </React.Fragment>
           )} */}
 
-          {currentStep === 'confirm' && (
-            <React.Fragment>
-              <Confirm/>
-              <div>
-                <ActionButton
-                  disabled={false}
-                  onClick={() => {
-                    this.storeSelectedFont();
-                    close();
-                  }}
-                >
-                  Start using my font now
-                </ActionButton>
-              </div>
-            </React.Fragment>
-          )}
+          {!needLogin &&
+            currentStep === 'confirm' && (
+              <React.Fragment>
+                <Confirm />
+                <div>
+                  <ActionButton
+                    disabled={false}
+                    onClick={() => {
+                      this.storeSelectedFont();
+                      close();
+                    }}
+                  >
+                    Start using my font now
+                  </ActionButton>
+                </div>
+              </React.Fragment>
+            )}
         </Popout>
       </React.Fragment>
     );

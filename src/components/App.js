@@ -4,6 +4,7 @@ import styled from 'react-emotion';
 
 import createComposerObserver from '../observers/composer';
 import createThreadObserver from '../observers/thread';
+import client, { gql } from '../graphqlClient';
 import Modal from './Modal';
 
 import { buttonDefault } from '../defaultStyles';
@@ -35,12 +36,16 @@ export default class App extends React.Component {
     this.threadObserver = createThreadObserver();
 
     this.state = {
+      loading: true,
       isOpen: false,
+      email: null,
       selectedFamily: null,
+      needLogin: false,
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    this.setState({ loading: true });
     // Script to get the user email from the config
     const s = document.createElement('script');
     s.setAttribute('src', chrome.runtime.getURL('js/emailDetector.js'));
@@ -50,10 +55,27 @@ export default class App extends React.Component {
     s2.setAttribute('src', 'https://apis.google.com/js/api:client.js');
     document.body.appendChild(s2);
 
+    document.body.appendChild(this.modalRoot);
+
     this.composerObserver.observe();
     this.threadObserver.observe();
 
-    document.body.appendChild(this.modalRoot);
+    // waiting for the mail div hack to be done.
+    const observer = new MutationObserver(() => {
+      const emailNode = document.getElementById('prototypo-unique-gmail-email');
+
+      if (!emailNode) return;
+
+      observer.disconnect();
+      const email = emailNode.textContent;
+      this.setState({ email });
+
+      console.log('Email is', email);
+
+      const token = localStorage.getItem('token');
+      this.handleLogin({ token });
+    });
+    observer.observe(document.body, { childList: true });
   }
 
   componentWillUnmount() {
@@ -63,12 +85,59 @@ export default class App extends React.Component {
     document.body.removeChild(this.modalRoot);
   }
 
-  storeFamily = family => {
+  handleLogin = async ({ token }) => {
+    console.log('Handle login app', token);
+    localStorage.setItem('token', token);
+    client.setHeader('authorization', 'Bearer ' + token);
+    try {
+      const {
+        user: { id, choosenFont },
+      } = await client.request(
+        gql`
+          query {
+            user {
+              id
+              choosenFont
+            }
+          }
+        `
+      );
+
+      console.log('Hello', this.state.email, 'your graphcool id is', id);
+
+      this.setState({
+        id,
+        selectedFamily: choosenFont,
+        needLogin: false,
+        loading: false,
+      });
+    } catch (err) {
+      // token seems invalid, need login
+      console.error(err);
+      this.setState({ loading: false, needLogin: true });
+    }
+  }
+
+  storeFamily = async family => {
     this.setState({ selectedFamily: family });
+
+    await client.request(
+      gql`
+        mutation changeChoosenFont($id: ID!, $font: String!) {
+          updateUser(id: $id, choosenFont: $font) {
+            id
+          }
+        }
+      `,
+      {
+        id: this.state.id,
+        font: family.name,
+      }
+    );
   };
 
   render() {
-    const { isOpen, selectedFamily } = this.state;
+    const { loading, isOpen, needLogin, selectedFamily } = this.state;
 
     return (
       <React.Fragment>
@@ -110,7 +179,8 @@ export default class App extends React.Component {
             />
           </svg>
           <InfoIcon>
-            {selectedFamily ? (
+            {/* TODO: loading icon ? */}
+            {selectedFamily || !needLogin ? (
               <svg viewBox="0 0 496.158 496.158">
                 <path
                   fill="#32bea6"
@@ -138,6 +208,9 @@ export default class App extends React.Component {
         {isOpen &&
           ReactDOM.createPortal(
             <Modal
+              needLogin={needLogin}
+              onLogin={this.handleLogin}
+              selectedFamily={selectedFamily}
               storeFamily={this.storeFamily}
               close={() => this.setState({ isOpen: false })}
             />,
