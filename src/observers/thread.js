@@ -1,6 +1,8 @@
-// import { batchLoadFontFromEmail } from './loadFont';
+import { batchLoadFontFromEmail } from '../loadFont';
 
 const observers = [];
+
+let fontList = [];
 
 const updateRow = (row, font) => {
   //Closed row
@@ -65,8 +67,7 @@ const observeConversation = ({ newURL }) => {
 
   // Initial displayed rows
   mailRows.map(async mailRow => {
-    // const font = await batchLoadFontFromEmail(mailRow.email);
-    const font = 'customFont, cursive';
+    const font = await batchLoadFontFromEmail(mailRow.email, fontList);
     updateRow(mailRow.row, font);
   });
 
@@ -93,8 +94,7 @@ const observeConversation = ({ newURL }) => {
       }
 
       const email = emailElement.getAttribute('email');
-      // const font = await batchLoadFontFromEmail(email);
-      const font = 'customFont, cursive';
+      const font = await batchLoadFontFromEmail(email, fontList);
 
       if (!font) {
         console.warn("Couldn't find the font associated to the email", email);
@@ -115,6 +115,9 @@ const observeConversation = ({ newURL }) => {
 
 export default function createThreadObserver() {
   return {
+    setFontList(list) {
+      fontList = list;
+    },
     observe() {
       window.addEventListener('hashchange', observeConversation);
       observeConversation({ newURL: window.location });

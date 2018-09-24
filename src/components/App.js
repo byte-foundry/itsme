@@ -36,6 +36,7 @@ export default class App extends React.Component {
     this.threadObserver = createThreadObserver();
 
     this.state = {
+      fontList: [],
       loading: true,
       isOpen: false,
       email: null,
@@ -56,6 +57,56 @@ export default class App extends React.Component {
     document.body.appendChild(s2);
 
     document.body.appendChild(this.modalRoot);
+
+    const fontListResponse = await fetch(
+      'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyAMYKtd8F3neG_z4FnkjhW1R6p24njPKLI'
+    );
+    const fontList = await fontListResponse.json();
+    // filter font list :
+    // - At least a regular
+    // - At least an italic
+    // - At least a bold
+    const filteredFonts = fontList.items
+      .filter(
+        family =>
+          family.variants.find(v => v === 'regular') &&
+          family.variants.find(v => v.includes('italic')) &&
+          family.variants.find(v => parseInt(v.split('italic')[0]) > 500)
+      )
+      // select the variants we want
+      .map(font => {
+        const regular =
+          font.variants.find(v => v === 'regular') ||
+          font.variants.find(
+            v =>
+              v.split('italic').length === 1 &&
+              (parseInt(v.split('italic')[0]) > 300 &&
+                parseInt(v.split('italic')[0]) < 600)
+          );
+        const italic =
+          font.variants.find(v => v === 'italic') ||
+          font.variants.find(v => v.includes('italic'));
+        const bold = font.variants.find(
+          v =>
+            v.split('italic').length === 1 &&
+            parseInt(v.split('italic')[0]) > 600
+        );
+        const boldItalic = font.variants.find(
+          v =>
+            v.split('italic').length > 1 && parseInt(v.split('italic')[0]) > 600
+        );
+
+        return {
+          ...font,
+          regular: font.files[regular],
+          italic: font.files[italic],
+          bold: font.files[bold],
+          boldItalic: font.files[boldItalic],
+        };
+      });
+    this.setState({ fontList: filteredFonts });
+
+    this.threadObserver.setFontList(filteredFonts);
 
     this.composerObserver.observe();
     this.threadObserver.observe();
@@ -116,7 +167,7 @@ export default class App extends React.Component {
       console.error(err);
       this.setState({ loading: false, needLogin: true });
     }
-  }
+  };
 
   storeFamily = async family => {
     this.setState({ selectedFamily: family });
@@ -137,7 +188,7 @@ export default class App extends React.Component {
   };
 
   render() {
-    const { loading, isOpen, needLogin, selectedFamily } = this.state;
+    const { loading, fontList, isOpen, needLogin, selectedFamily } = this.state;
 
     return (
       <React.Fragment>
@@ -208,6 +259,7 @@ export default class App extends React.Component {
         {isOpen &&
           ReactDOM.createPortal(
             <Modal
+              fontList={fontList}
               needLogin={needLogin}
               onLogin={this.handleLogin}
               selectedFamily={selectedFamily}

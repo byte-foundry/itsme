@@ -111,70 +111,25 @@ export default class Modal extends React.Component {
     };
   }
 
-  async componentWillMount() {
-    const fontListResponse = await fetch(
-      'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyAMYKtd8F3neG_z4FnkjhW1R6p24njPKLI'
-    );
-    const fontList = await fontListResponse.json();
-    // filter font list :
-    // - At least a regular
-    // - At least an italic
-    // - At least a bold
-    const filteredFonts = fontList.items.filter(
-      family =>
-        family.variants.find(v => v === 'regular') &&
-        family.variants.find(v => v.includes('italic')) &&
-        family.variants.find(v => parseInt(v.split('italic')[0]) > 500)
-    );
-    // get categories
-    const categories = [...new Set(filteredFonts.map(item => item.category))];
-    categories.unshift('all');
-    this.setState({ fontList: filteredFonts, categories });
-  }
-
   handleSelectFont = font => {
     this.setState({ selectedFont: font });
   };
 
   storeSelectedFont = () => {
-    const font = this.state.selectedFont;
-    const selectedRegular =
-      font.variants.find(v => v === 'regular') ||
-      font.variants.find(
-        v =>
-          v.split('italic').length === 1 &&
-          (parseInt(v.split('italic')[0]) > 300 &&
-            parseInt(v.split('italic')[0]) < 600)
-      );
-    const selectedItalic =
-      font.variants.find(v => v === 'italic') ||
-      font.variants.find(v => v.includes('italic'));
-    const selectedBold = font.variants.find(
-      v =>
-        v.split('italic').length === 1 && parseInt(v.split('italic')[0]) > 600
-    );
-    const selectedBoldItalic = font.variants.find(
-      v => v.split('italic').length > 1 && parseInt(v.split('italic')[0]) > 600
-    );
-
-    this.props.storeFamily({
-      name: font.family,
-      regular: font.files[selectedRegular],
-      italic: font.files[selectedItalic],
-      bold: font.files[selectedBold],
-      boldItalic: font.files[selectedBoldItalic],
-    });
+    this.props.storeFamily(this.state.selectedFont);
   };
 
   render() {
-    const { email, needLogin, onLogin, close } = this.props;
+    const { email, needLogin, fontList, onLogin, close } = this.props;
     const {
       currentStep,
-      fontList,
       selectedFont,
       selectedVariant,
-      categories,
     } = this.state;
+
+    // get categories
+    const categories = [...new Set(fontList.map(item => item.category))];
+    categories.unshift('all');
 
     return (
       <React.Fragment>
