@@ -24,6 +24,7 @@ const Popout = styled('div')`
   position: absolute;
   top: 0;
   width: 350px;
+  overflow-y: auto;
   bottom: 0;
   background: #fff;
   z-index: 10000001;
