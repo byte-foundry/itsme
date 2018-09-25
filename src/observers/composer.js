@@ -8,7 +8,7 @@ export default function createComposerUpdater(id) {
   // We're going to reinsert the elements that changes to font
   function checkAppliedFont(composer) {
     const targetChildren = Array.from(composer.childNodes).filter(
-      child => !(child.classList && child.classList.contains('gmail_extra'))
+      child => !(child.classList && child.classList.contains('gmail_quote'))
     );
 
     if (targetChildren.every(child => child.style && child.style.fontFamily)) {
@@ -41,7 +41,7 @@ export default function createComposerUpdater(id) {
       if (
         mutation.addedNodes[0] instanceof Text &&
         mutation.target.classList &&
-        mutation.target.classList.contains('gmail_extra')
+        mutation.target.classList.contains('gmail_quote')
       ) {
         const div = document.createElement('div');
         div.style.fontFamily = fontFamily;
