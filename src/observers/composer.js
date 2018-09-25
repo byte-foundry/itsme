@@ -3,7 +3,7 @@ import { batchLoadFontFromEmail } from '../loadFont';
 export default function createComposerUpdater(id) {
   let font = null;
   let userId = id;
-  let fontFamily = userId + ', cursive';
+  let fontFamily = userId + ', arial';
   // The email composer needs to be updated
   // We're going to reinsert the elements that changes to font
   function checkAppliedFont(composer) {
@@ -159,7 +159,7 @@ export default function createComposerUpdater(id) {
   return {
     setFont(id, family) {
       userId = id;
-      fontFamily = id + ', cursive';
+      fontFamily = id + ', arial';
       font = family;
     },
 
