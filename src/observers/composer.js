@@ -8,7 +8,7 @@ export default function createComposerUpdater(id) {
   // We're going to reinsert the elements that changes to font
   function checkAppliedFont(composer) {
     const targetChildren = Array.from(composer.childNodes).filter(
-      child => !(child.classList && child.classList.contains('gmail_quote'))
+      child => !(child.classList && (child.classList.contains('gmail_quote') || child.classList.contains('gmail_signature')))
     );
 
     if (targetChildren.every(child => child.style && child.style.fontFamily)) {
@@ -40,8 +40,10 @@ export default function createComposerUpdater(id) {
     mutations.forEach(mutation => {
       if (
         mutation.addedNodes[0] instanceof Text &&
-        mutation.target.classList &&
-        mutation.target.classList.contains('gmail_quote')
+        mutation.target.classList && (
+        mutation.target.classList.contains('gmail_quote') ||
+        mutation.target.classList.contains('gmail_signature')
+        )
       ) {
         const div = document.createElement('div');
         div.style.fontFamily = fontFamily;
@@ -134,7 +136,7 @@ export default function createComposerUpdater(id) {
     } else {
       const extensionBanner = document.createElement('div');
       extensionBanner.innerHTML =
-        '<div lang="itsmebanner"><font face="arial, helvetica, sans-serif" color="#aaaaaa">I send emails with a bespoke font. <u>Click here to display it!</u></font><br><br></div>';
+        '<div lang="itsmebanner"><font face="arial, helvetica, sans-serif" color="#aaaaaa">I send emails with a bespoke font. <u>>Click <a href="https://chrome.google.com/webstore/detail/gjoidokckjeljfgifeemgbopbgbefopm"here</a> to display it.</u></font><br><br></div>';
       const composerElem = openedComposers.find(e => e === container);
       composerElem.composerEvent = composer.addEventListener('keydown', e => {
         console.log('keydown')
