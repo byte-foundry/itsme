@@ -84,6 +84,9 @@ class Login extends React.Component {
           );
 
           this.setState({ loading: false });
+          try {
+            ga('send', 'event', 'User', 'Registered', '');
+          } catch (e) {}
           onLogin({ id, token });
         } catch (err) {
           console.error(err);

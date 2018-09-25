@@ -120,6 +120,12 @@ export default class Modal extends React.Component {
     this.props.storeFamily(this.state.selectedFont);
   };
 
+  componentDidMount() {
+    try {
+      ga('send', 'event', 'User', 'OpenedModal', '');
+    } catch (e) {}
+  }
+
   render() {
     const { email, needLogin, fontList, onLogin, close } = this.props;
     const {

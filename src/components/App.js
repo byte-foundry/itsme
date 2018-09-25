@@ -83,6 +83,16 @@ export default class App extends React.Component {
     s2.setAttribute('src', 'https://apis.google.com/js/api:client.js');
     document.body.appendChild(s2);
 
+
+    const s3 = document.createElement('script');
+    s3.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=UA-41962243-10');
+    document.body.appendChild(s3);
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-41962243-10');
+
     document.body.appendChild(this.modalRoot);
 
     const fontListResponse = await fetch(
@@ -122,6 +132,10 @@ export default class App extends React.Component {
           v =>
             v.includes('italic') && parseInt(v.split('italic')[0]) > 500
         );
+
+        try {
+          ga('send', 'event', 'User', 'LaunchedApp', '');
+        } catch (e) {}
 
         return {
           ...font,
@@ -193,6 +207,10 @@ export default class App extends React.Component {
         needLogin: false,
         loading: false,
       });
+
+      try {
+        ga('send', 'event', 'User', 'Connected', '');
+      } catch (e) {}
     } catch (err) {
       // token seems invalid, need login
       console.error(err);
@@ -203,7 +221,9 @@ export default class App extends React.Component {
   storeFamily = async family => {
     this.setState({ selectedFamily: family });
     this.composerObserver.setFont(this.state.id, family);
-
+    try {
+      ga('send', 'event', 'User', 'SelectedFont', '');
+    } catch (e) {}
     await client.request(
       gql`
         mutation changeChoosenFont($id: ID!, $font: String!) {
