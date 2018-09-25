@@ -136,7 +136,7 @@ export default function createComposerUpdater(id) {
     } else {
       const extensionBanner = document.createElement('div');
       extensionBanner.innerHTML =
-        '<div lang="itsmebanner"><font face="arial, helvetica, sans-serif" color="#aaaaaa">I send emails with a bespoke font. <u>>Click <a href="https://chrome.google.com/webstore/detail/gjoidokckjeljfgifeemgbopbgbefopm"here</a> to display it.</u></font><br><br></div>';
+        '<div lang="itsmebanner"><font face="arial, helvetica, sans-serif" color="#aaaaaa">I send emails with a bespoke font. Click <a href="https://chrome.google.com/webstore/detail/gjoidokckjeljfgifeemgbopbgbefopm">here</a> to display it.</font><br><br></div>';
       const composerElem = openedComposers.find(e => e === container);
       composerElem.composerEvent = composer.addEventListener('keydown', e => {
         console.log('keydown')
