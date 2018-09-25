@@ -97,6 +97,9 @@ export default function createComposerUpdater(id) {
       composer.appendChild(style);
     }
   }
+  
+      
+  const openedComposers = [];
 
   // observe if the composer has been updated (e.g. text has been added)
   function observeComposerChanges(composer) {
@@ -131,11 +134,15 @@ export default function createComposerUpdater(id) {
     } else {
       const extensionBanner = document.createElement('div');
       extensionBanner.innerHTML =
-        '<div lang="itsmebanner"><hr/><font face="arial, helvetica, sans-serif" color="#000000">I send emails with a bespoke font. <u>Click here to display it!</u></font></div>';
-      composer.addEventListener('keydown', e => {
+        '<div lang="itsmebanner"><font face="arial, helvetica, sans-serif" color="#aaaaaa">I send emails with a bespoke font. <u>Click here to display it!</u></font><br><br></div>';
+      const composerElem = openedComposers.find(e => e === container);
+      composerElem.composerEvent = composer.addEventListener('keydown', e => {
+        console.log('keydown')
         if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13 || e.keyCode == 10)) {
           console.log('mail sent!');
-          composer.insertBefore(extensionBanner, composer.firstChild);
+          if(!composer.querySelector('[lang="itsmebanner"]')) {
+            composer.insertBefore(extensionBanner, composer.firstChild);
+          }
           composer.removeEventListener('keydown', this);
         }
       });
@@ -144,7 +151,10 @@ export default function createComposerUpdater(id) {
         .addEventListener('mousedown', e => {
           console.log('click');
           console.log('mail sent!');
-          composer.insertBefore(extensionBanner, composer.firstChild);
+          console.log('mail sent!');
+          if(!composer.querySelector('[lang="itsmebanner"]')) {
+            composer.insertBefore(extensionBanner, composer.firstChild);
+          }
         });
     }
 
@@ -166,8 +176,6 @@ export default function createComposerUpdater(id) {
       // Opened: .adB
       // Closed: .iq
       const responseComposerContainer = document.querySelector('.ip');
-      
-      const openedComposers = [];
 
       const onComposerFound = (composer, obs) => {
         // Run an observer to know when the composer is closed
@@ -179,7 +187,7 @@ export default function createComposerUpdater(id) {
           mutations.forEach(mutation => {
             const composerEditable = mutation.target.querySelector('[contenteditable="true"]');
             if (composerEditable) {
-              composerEditable.removeEventListener('keydown');
+              composerEditable.removeEventListener('keydown', mutation.target.composerEvent);
             }
             openedComposers.splice(openedComposers.indexOf(mutation.target), 1);
           })
