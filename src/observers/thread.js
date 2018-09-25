@@ -23,8 +23,7 @@ const updateRow = (row, font) => {
   const previewDiv = row.querySelector('.adf.ads');
   if (previewDiv && previewDiv.style.display === 'none') {
     // Complete email
-    const allBanners = row.querySelectorAll('[lang="itsmebanner"]');
-    allBanners.forEach(banner => banner.style.display = 'none')
+    console.log('complete email')
     return;
   }
 
@@ -42,6 +41,7 @@ const observeConversation = ({ newURL }) => {
   // Detect URL of a conversation on Gmail
   if (!/(inbox|sent)\/[a-zA-Z0-9]+/.test(newURL)) {
     if (/(inbox|sent)/.test(newURL)) {
+      console.log('sent - inbox list')
       // Strip extension headers from sent - inbox list
       Array.from(document.querySelectorAll('[draggable="true"]')).forEach(
         row => {
@@ -55,6 +55,10 @@ const observeConversation = ({ newURL }) => {
     }
     return;
   }
+
+  
+  const allBanners = document.querySelectorAll('[lang="itsmebanner"]');
+  allBanners.forEach(banner => banner.style.display = 'none');
 
   console.log('Conversation detected, applying stuff');
 
@@ -79,12 +83,12 @@ const observeConversation = ({ newURL }) => {
     mutations.forEach(async mutation => {
       if (
         mutation.target.parentNode !== mailList ||
-        mutation.type !== 'attributes' ||
-        mutation.attributeName !== 'class'
+        mutation.type !== 'attributes'
       ) {
         return;
       }
-
+      console.log('new row appeared')
+     
       const row = mutation.target;
       const emailElement = row.querySelector('[email]');
 
@@ -96,11 +100,13 @@ const observeConversation = ({ newURL }) => {
       const email = emailElement.getAttribute('email');
       const font = await batchLoadFontFromEmail(email, fontList);
 
+      const allBanners = document.querySelectorAll('[lang="itsmebanner"]');
+      allBanners.forEach(banner => banner.style.display = 'none');
+
       if (!font) {
         console.warn("Couldn't find the font associated to the email", email);
         return;
       }
-
       updateRow(row, font);
     });
   });

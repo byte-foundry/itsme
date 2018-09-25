@@ -103,7 +103,6 @@ export default function createComposerUpdater(id) {
     //TODO : Stop listening if composer closed
     const contentChangedCallback = mutations => {
       console.log('Changes for the composer', mutations);
-
       checkGmailExtra(mutations, composer);
       checkStyleTag(composer);
       checkAppliedFont(composer);
@@ -130,16 +129,14 @@ export default function createComposerUpdater(id) {
       );
       return;
     } else {
-      console.log('composer found');
       const extensionBanner = document.createElement('div');
       extensionBanner.innerHTML =
         '<div lang="itsmebanner"><hr/><font face="arial, helvetica, sans-serif" color="#000000">I send emails with a bespoke font. <u>Click here to display it!</u></font></div>';
-
       composer.addEventListener('keydown', e => {
-        console.log('keydown');
         if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13 || e.keyCode == 10)) {
           console.log('mail sent!');
           composer.insertBefore(extensionBanner, composer.firstChild);
+          composer.removeEventListener('keydown', this);
         }
       });
       container
@@ -165,33 +162,28 @@ export default function createComposerUpdater(id) {
 
     // Observe if the text editor panel has been open
     observe() {
-      console.log('hello there');
       // Composer response container .ip
       // Opened: .adB
       // Closed: .iq
       const responseComposerContainer = document.querySelector('.ip');
-
-      if (!responseComposerContainer) {
-        console.error(
-          'The node of the response composer container has not been found.'
-        );
-      } else {
-        const observer = new MutationObserver(() =>
-          updateComposerIfPresent(responseComposerContainer)
-        );
-        observer.observe(responseComposerContainer, {
-          attributes: true,
-        });
-        observers.push(observer);
-        updateComposerIfPresent(responseComposerContainer);
-      }
-
+      
       const openedComposers = [];
 
       const onComposerFound = (composer, obs) => {
         // Run an observer to know when the composer is closed
-        const observer = new MutationObserver(() => {
-          openedComposers.splice(openedComposers.indexOf(composer), 1);
+        if (openedComposers.find(c => c === composer)) {
+          return;
+        }
+        openedComposers.push(composer);
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach(mutation => {
+            const composerEditable = mutation.target.querySelector('[contenteditable="true"]');
+            if (composerEditable) {
+              composerEditable.removeEventListener('keydown');
+            }
+            openedComposers.splice(openedComposers.indexOf(mutation.target), 1);
+          })
+          
         });
         observer.observe(composer, {
           childList: true,
@@ -201,6 +193,16 @@ export default function createComposerUpdater(id) {
         // Update composer
         updateComposerIfPresent(composer);
       };
+
+
+      if (!responseComposerContainer) {
+        console.error(
+          'The node of the response composer container has not been found.'
+        );
+      } else {
+        onComposerFound(responseComposerContainer);
+      }
+
 
       // Watching when the container is going to be inserted
       const bodyCallback = () => {
@@ -218,17 +220,13 @@ export default function createComposerUpdater(id) {
         });
         if (
           createComposerContainer !== null &&
-          createComposerContainer.querySelector('[contenteditable="true"]') &&
-          !openedComposers.find(c => c === createComposerContainer)
+          createComposerContainer.querySelector('[contenteditable="true"]')          
         ) {
-          openedComposers.push(createComposerContainer);
           onComposerFound(createComposerContainer, this);
         } else if (
           threadComposerContainer !== null &&
-          threadComposerContainer.querySelector('[contenteditable="true"]') &&
-          !openedComposers.find(c => c === threadComposerContainer)
+          threadComposerContainer.querySelector('[contenteditable="true"]')
         ) {
-          openedComposers.push(threadComposerContainer);
           onComposerFound(threadComposerContainer, this);
         }
       };
