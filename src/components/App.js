@@ -202,7 +202,7 @@ export default class App extends React.Component {
 
   storeFamily = async family => {
     this.setState({ selectedFamily: family });
-    this.composerObserver.setFont(id, family);
+    this.composerObserver.setFont(this.state.id, family);
 
     await client.request(
       gql`
@@ -214,7 +214,7 @@ export default class App extends React.Component {
       `,
       {
         id: this.state.id,
-        font: family.name,
+        font: family.family,
       }
     );
   };
