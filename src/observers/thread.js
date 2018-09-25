@@ -10,9 +10,7 @@ const updateRow = (row, font) => {
     return;
   }
 
-  const mailContents = Array.from(row.querySelectorAll('.iA.g6')).concat(
-    Array.from(row.querySelectorAll('.ii.gt'))
-  );
+  const mailContents = Array.from(row.querySelectorAll('.iA.g6'));
 
   if (!mailContents.length) {
     console.warn("Couldn't find any mail content :(");
@@ -21,20 +19,16 @@ const updateRow = (row, font) => {
 
   // We want to inject fonts only on the preview (not the complete mail)
   const previewDiv = row.querySelector('.adf.ads');
-  if (previewDiv && previewDiv.style.display === 'none') {
+  if (previewDiv && previewDiv.style.display !== 'none') {
     // Complete email
-    console.log('complete email')
-    return;
+    mailContents.forEach(node => {
+      node.style.fontFamily = font;
+      node.innerText = node.innerText.replace(
+        'I send emails with a bespoke font. Click here to display it!',
+        ''
+      );
+    });
   }
-
-  mailContents.forEach(node => {
-    // Folded email
-    node.style.fontFamily = font;
-    node.innerText = node.innerText.replace(
-      'I send emails with a bespoke font. Click here to display it!',
-      ''
-    );
-  });
 };
 
 const observeConversation = ({ newURL }) => {
@@ -55,8 +49,8 @@ const observeConversation = ({ newURL }) => {
     }
     return;
   }
-
   
+
   const allBanners = document.querySelectorAll('[lang="itsmebanner"]');
   allBanners.forEach(banner => banner.style.display = 'none');
 
