@@ -1,8 +1,7 @@
 {
   "name": "It's me",
-  "version": "1.0",
+  "version": "1.0.3",
   "description": "Use your unique font in Gmail.",
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs5TTR2dggNy6My6p2fmphhE0+YquzhUdtQjjE5Xfi9LNihCvPHF6y5gqn2jroAbStcxAj4J1EmpyVTbf25L44vLZGnXAz136/gIzytdKaB2+vOIOlx2y3lzkJuV8cuobg01V2Hut+IeLENixjh5vw/48cK9C+/YjZ31YyzTKf1Pit1kp2ue90vzx5sz4ip5KxKzRgamCwpteLJ0uUwk85xbh750KnMUrp2LOjG7qTmybcH8mnXyaPDGERUDyw0W8KXEKm0ndiFiXPAlYuB/jCx/H38N55SXkam8fqhoOvxYjOF+qmELystiYoS0VwOmbkuc7Nk+2jSzVwTVC5LfRRQIDAQAB",
   "manifest_version": 2,
   "icons": {
     "16": "images/logo_16.png",
