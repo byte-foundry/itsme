@@ -3,7 +3,7 @@ import styled from 'react-emotion';
 
 import { textDefault, buttonDefault } from '../defaultStyles';
 import { colors } from '../variables';
-import placeholderImage from '../../images/placeholder.png';
+import mainImage from '../../images/main.png';
 
 const Text = styled('p')`
   ${textDefault};
@@ -12,6 +12,13 @@ const Text = styled('p')`
 const Img = styled('img')`
   width: 100%;
   height: auto;
+`;
+
+const DisabledText = styled('p')`
+  margin: 0;
+  text-align: right;
+  color: #aaa;
+  font-style: italic;
 `;
 
 const ActionButton = styled('button')`
@@ -51,8 +58,8 @@ const ActionButton = styled('button')`
 const ChooseFontOrigin = ({ onChoose }) => (
   <div>
     <Img
-      src={chrome.runtime.getURL(placeholderImage)}
-      alt="placeholder image"
+      src={chrome.runtime.getURL(mainImage)}
+      alt="main image"
     />
     <Text>Choose a way to personnalise your emails:</Text>
     <ActionButton
@@ -75,6 +82,7 @@ const ChooseFontOrigin = ({ onChoose }) => (
       </svg>
       Custom fonts
     </ActionButton>
+    <DisabledText>Coming soon!</DisabledText>
   </div>
 );
 

@@ -32,7 +32,7 @@ const Text = styled('p')`
 `;
 
 const Img = styled('img')`
-  width: 100%;
+  width: 350px;
   height: auto;
   margin-top: 20px;
   margin-bottom: 30px;
