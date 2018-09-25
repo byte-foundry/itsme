@@ -26,6 +26,33 @@ const InfoIcon = styled('div')`
   }
 `;
 
+const Font = styled('div')`
+  @font-face {
+    font-family: ${props => props.id};
+    font-style: normal;
+    font-weight: normal;
+    src: url(${props => props.regular}) format('woff2');
+  }
+  @font-face {
+    font-family: ${props => props.id};
+    font-style: italic;
+    font-weight: normal;
+    src: url(${props => props.italic}) format('woff2');
+  }
+  @font-face {
+    font-family: ${props => props.id};
+    font-style: normal;
+    font-weight: bold;
+    src: url(${props => props.bold}) format('woff2');
+  }
+  @font-face {
+    font-family: ${props => props.id};
+    font-style: italic;
+    font-weight: bold;
+    src: url(${props => props.boldItalic}) format('woff2');
+  }
+`;
+
 export default class App extends React.Component {
   constructor() {
     super();
@@ -71,7 +98,7 @@ export default class App extends React.Component {
         family =>
           family.variants.find(v => v === 'regular') &&
           family.variants.find(v => v.includes('italic')) &&
-          family.variants.find(v => parseInt(v.split('italic')[0]) > 500)
+          family.variants.find(v => v.includes('italic') && parseInt(v.split('italic')[0]) > 500)
       )
       // select the variants we want
       .map(font => {
@@ -93,15 +120,15 @@ export default class App extends React.Component {
         );
         const boldItalic = font.variants.find(
           v =>
-            v.split('italic').length > 1 && parseInt(v.split('italic')[0]) > 600
+            v.includes('italic') && parseInt(v.split('italic')[0]) > 500
         );
 
         return {
           ...font,
-          regular: font.files[regular],
-          italic: font.files[italic],
-          bold: font.files[bold],
-          boldItalic: font.files[boldItalic],
+          regular: font.files[regular].replace('http:', 'https:'),
+          italic: font.files[italic].replace('http:', 'https:'),
+          bold: font.files[bold].replace('http:', 'https:'),
+          boldItalic: font.files[boldItalic].replace('http:', 'https:'),
         };
       });
     this.setState({ fontList: filteredFonts });
@@ -156,9 +183,13 @@ export default class App extends React.Component {
 
       console.log('Hello', this.state.email, 'your graphcool id is', id);
 
+      const selectedFamily = this.state.fontList.find(f => f.family === choosenFont) || choosenFont;
+
+      this.composerObserver.setFont(id, selectedFamily);
+
       this.setState({
         id,
-        selectedFamily: choosenFont,
+        selectedFamily,
         needLogin: false,
         loading: false,
       });
@@ -171,6 +202,7 @@ export default class App extends React.Component {
 
   storeFamily = async family => {
     this.setState({ selectedFamily: family });
+    this.composerObserver.setFont(id, family);
 
     await client.request(
       gql`
@@ -188,10 +220,20 @@ export default class App extends React.Component {
   };
 
   render() {
-    const { loading, fontList, isOpen, needLogin, selectedFamily } = this.state;
+    const {
+      loading,
+      id,
+      fontList,
+      isOpen,
+      needLogin,
+      selectedFamily,
+    } = this.state;
+
+    console.log(selectedFamily)
 
     return (
       <React.Fragment>
+        {id && selectedFamily && <Font id={id} {...selectedFamily} />}
         <Button
           className="G-Ni J-J5-Ji"
           onClick={() => this.setState({ isOpen: true })}

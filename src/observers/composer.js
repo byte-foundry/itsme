@@ -1,5 +1,9 @@
-export default function createComposerUpdater(userFont) {
-  const fontFamily = userFont + ', cursive';
+import { batchLoadFontFromEmail } from '../loadFont';
+
+export default function createComposerUpdater(id) {
+  let font = null;
+  let userId = id;
+  let fontFamily = userId + ', cursive';
   // The email composer needs to be updated
   // We're going to reinsert the elements that changes to font
   function checkAppliedFont(composer) {
@@ -55,11 +59,40 @@ export default function createComposerUpdater(userFont) {
   }
 
   function checkStyleTag(composer) {
-    if (!composer.textContent.includes('localhost:5555')) {
+    console.log('check style tag', font)
+    if (!font) {
+      return;
+    }
+
+    console.log('has the regular link?', composer.textContent.includes(font.regular));
+    if (!composer.textContent.includes(font.regular)) {
       // Adding style element to the composer with the link to the font
       const style = document.createElement('style');
       style.innerHTML = `
-        @import url('http://localhost:5555/${userFont}');
+        @font-face {
+          font-family: ${userId};
+          font-style: normal;
+          font-weight: normal;
+          src: url(${font.regular}) format('woff2');
+        }
+        @font-face {
+          font-family: ${userId};
+          font-style: italic;
+          font-weight: normal;
+          src: url(${font.italic}) format('woff2');
+        }
+        @font-face {
+          font-family: ${userId};
+          font-style: normal;
+          font-weight: bold;
+          src: url(${font.bold}) format('woff2');
+        }
+        @font-face {
+          font-family: ${userId};
+          font-style: italic;
+          font-weight: bold;
+          src: url(${font.boldItalic}) format('woff2');
+        }
       `;
       composer.appendChild(style);
     }
@@ -124,6 +157,12 @@ export default function createComposerUpdater(userFont) {
   const observers = [];
 
   return {
+    setFont(id, family) {
+      userId = id;
+      fontFamily = id + ', cursive';
+      font = family;
+    },
+
     // Observe if the text editor panel has been open
     observe() {
       console.log('hello there');
@@ -158,11 +197,10 @@ export default function createComposerUpdater(userFont) {
           childList: true,
         });
         observers.push(observer);
-        
+
         // Update composer
         updateComposerIfPresent(composer);
       };
-
 
       // Watching when the container is going to be inserted
       const bodyCallback = () => {
@@ -171,7 +209,10 @@ export default function createComposerUpdater(userFont) {
         const threadComposerContainers = document.querySelectorAll('.ip');
         let threadComposerContainer = null;
         threadComposerContainers.forEach(t => {
-          if (t.querySelector('[contenteditable="true"]') && !openedComposers.find(c => c === t)) {
+          if (
+            t.querySelector('[contenteditable="true"]') &&
+            !openedComposers.find(c => c === t)
+          ) {
             threadComposerContainer = t;
           }
         });
@@ -192,8 +233,6 @@ export default function createComposerUpdater(userFont) {
         }
       };
 
-      
-
       const runBodyObserver = () => {
         let bodyObserver = new MutationObserver(bodyCallback);
         bodyObserver.observe(document.body, {
@@ -202,12 +241,10 @@ export default function createComposerUpdater(userFont) {
           subtree: true,
         });
         observers.push(bodyObserver);
-      }
-
-      
+      };
 
       window.addEventListener('hashchange', () => {
-        console.log('hashchange')
+        console.log('hashchange');
         if (/(inbox|sent)\/[a-zA-Z0-9]+/.test(window.location)) {
           runBodyObserver();
         }
