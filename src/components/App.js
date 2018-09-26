@@ -53,6 +53,13 @@ const Font = styled('div')`
   }
 `;
 
+export const runFunctionInPageContext = (fn) => {
+  var script = document.createElement('script');
+  script.textContent = '(' + fn.toString() + '());';
+  document.documentElement.appendChild(script);
+  document.documentElement.removeChild(script);
+}
+
 export default class App extends React.Component {
   constructor() {
     super();
@@ -82,18 +89,19 @@ export default class App extends React.Component {
     const s2 = document.createElement('script');
     s2.setAttribute('src', 'https://apis.google.com/js/api:client.js');
     document.body.appendChild(s2);
-
-
-    const s3 = document.createElement('script');
-    s3.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=UA-41962243-10');
-    document.body.appendChild(s3);
-
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-41962243-10');
-
     document.body.appendChild(this.modalRoot);
+
+    runFunctionInPageContext(function () {
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o);
+      a.async=1;a.src=g;document.documentElement.appendChild(a)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    });
+
+    runFunctionInPageContext(function () {
+      ga('create', 'UA-41962243-10', 'auto', {'name': 'itsMe'});
+      ga('itsMe.send', 'pageview');
+    });
 
     const fontListResponse = await fetch(
       'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyAMYKtd8F3neG_z4FnkjhW1R6p24njPKLI'
@@ -132,11 +140,7 @@ export default class App extends React.Component {
           v =>
             v.includes('italic') && parseInt(v.split('italic')[0]) > 500
         );
-
-        try {
-          ga('send', 'event', 'User', 'LaunchedApp', '');
-        } catch (e) {}
-
+        
         return {
           ...font,
           regular: font.files[regular].replace('http:', 'https:'),
@@ -207,10 +211,9 @@ export default class App extends React.Component {
         needLogin: false,
         loading: false,
       });
-
-      try {
-        ga('send', 'event', 'User', 'Connected', '');
-      } catch (e) {}
+      runFunctionInPageContext(function () {
+        ga('itsMe.send', 'event', 'User', 'Connected', '');
+      });
     } catch (err) {
       // token seems invalid, need login
       console.error(err);
@@ -221,9 +224,9 @@ export default class App extends React.Component {
   storeFamily = async family => {
     this.setState({ selectedFamily: family });
     this.composerObserver.setFont(this.state.id, family);
-    try {
-      ga('send', 'event', 'User', 'SelectedFont', '');
-    } catch (e) {}
+    runFunctionInPageContext(function () {
+      ga('itsMe.send', 'event', 'User', 'SelectFont', '');
+    });
     await client.request(
       gql`
         mutation changeChoosenFont($id: ID!, $font: String!) {

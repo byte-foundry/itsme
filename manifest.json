@@ -3,6 +3,7 @@
   "version": "1.0.3",
   "description": "Use your unique font in Gmail.",
   "manifest_version": 2,
+  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "icons": {
     "16": "images/logo_16.png",
     "32": "images/logo_32.png",

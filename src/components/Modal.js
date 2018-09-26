@@ -6,6 +6,8 @@ import SelectFont from './SelectFont';
 import SelectVariant from './SelectVariant';
 import Confirm from './Confirm';
 
+import {runFunctionInPageContext} from './App';
+
 import { buttonDefault } from '../defaultStyles';
 import { colors } from '../variables';
 import ChooseFontOrigin from './ChooseFontOrigin';
@@ -121,9 +123,9 @@ export default class Modal extends React.Component {
   };
 
   componentDidMount() {
-    try {
-      ga('send', 'event', 'User', 'OpenedModal', '');
-    } catch (e) {}
+    runFunctionInPageContext(function () {
+      ga('itsMe.send', 'event', 'User', 'OpenedModal', '');
+    });
   }
 
   render() {

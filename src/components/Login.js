@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'react-emotion';
-
 import { textDefault, buttonDefault } from '../defaultStyles';
 import { colors } from '../variables';
-
+import { runFunctionInPageContext } from './App';
 import client, { gql } from '../graphqlClient';
 
 const Text = styled('p')`
@@ -84,9 +83,9 @@ class Login extends React.Component {
           );
 
           this.setState({ loading: false });
-          try {
-            ga('send', 'event', 'User', 'Registered', '');
-          } catch (e) {}
+          runFunctionInPageContext(function () {
+            ga('itsMe.send', 'event', 'User', 'Registered', '');
+          });
           onLogin({ id, token });
         } catch (err) {
           console.error(err);
