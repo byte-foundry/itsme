@@ -109,6 +109,7 @@ export default class Modal extends React.Component {
     this.state = {
       currentStep: 'selectFontOrigin',
       fontList: [],
+      showBanner: props.showBanner,
       selectedFont: (props.selectedFamily && props.selectedFamily.name) || null,
       selectedVariant: null,
     };
@@ -119,7 +120,7 @@ export default class Modal extends React.Component {
   };
 
   storeSelectedFont = () => {
-    this.props.storeFamily(this.state.selectedFont);
+    this.props.storeFamily(this.state.selectedFont, this.state.showBanner);
   };
 
   componentDidMount() {
@@ -219,7 +220,12 @@ export default class Modal extends React.Component {
           {!needLogin &&
             currentStep === 'confirm' && (
               <React.Fragment>
-                <Confirm />
+                <Confirm
+                  showBanner={this.state.showBanner}
+                  onChoose={() =>
+                    this.setState({ showBanner: !this.state.showBanner })
+                  }
+                />
                 <div>
                   <ActionButton
                     disabled={false}

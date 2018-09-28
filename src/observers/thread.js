@@ -23,10 +23,6 @@ const updateRow = (row, font) => {
     // Complete email
     mailContents.forEach(node => {
       node.style.fontFamily = font;
-      node.innerText = node.innerText.replace(
-        'I send emails with a bespoke font. Click here to display it!',
-        ''
-      );
     });
   }
 };
@@ -36,16 +32,6 @@ const observeConversation = ({ newURL }) => {
   if (!/(inbox|sent)\/[a-zA-Z0-9]+/.test(newURL)) {
     if (/(inbox|sent)/.test(newURL)) {
       console.log('sent - inbox list')
-      // Strip extension headers from sent - inbox list
-      Array.from(document.querySelectorAll('[draggable="true"]')).forEach(
-        row => {
-          const rowText = row.querySelector('.y2');
-          rowText.innerText = rowText.innerText.replace(
-            'I send emails with a bespoke font. Click here to display it!',
-            ''
-          );
-        }
-      );
     }
     return;
   }

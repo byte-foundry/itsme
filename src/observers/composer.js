@@ -36,6 +36,8 @@ export default function createComposerUpdater(id) {
     });
   }
 
+  let showBanner = false;
+
   function checkGmailExtra(mutations, composer) {
     mutations.forEach(mutation => {
       if (
@@ -125,6 +127,27 @@ export default function createComposerUpdater(id) {
     checkAppliedFont(composer);
   }
 
+  const getExtensionBanner = (composer) => {
+    const extensionBanner = document.createElement('div');
+      extensionBanner.innerHTML =
+        `
+        <style>
+          .preheader { display:none !important; visibility:hidden; opacity:0; color:transparent; height:0; width:0; }
+        </style>
+        <span class="preheader" style="color:transparent; display:none !important; height:0; opacity:0; visibility:hidden; width:0">
+          ${composer.innerText.substring(0,100)}
+        </span>
+        <div lang="itsmebanner">
+          <font face="arial, helvetica, sans-serif" color="#aaaaaa">
+            I send emails with a bespoke font. 
+            Click <a href="https://chrome.google.com/webstore/detail/gjoidokckjeljfgifeemgbopbgbefopm">here</a> to display it.
+          </font>
+          <br>
+          <br>
+        </div>`;
+      return extensionBanner;
+  }
+
   const updateComposerIfPresent = (container = document) => {
     const composer = container.querySelector('[contenteditable="true"]');
 
@@ -134,16 +157,15 @@ export default function createComposerUpdater(id) {
       );
       return;
     } else {
-      const extensionBanner = document.createElement('div');
-      extensionBanner.innerHTML =
-        '<div lang="itsmebanner"><font face="arial, helvetica, sans-serif" color="#aaaaaa">I send emails with a bespoke font. Click <a href="https://chrome.google.com/webstore/detail/gjoidokckjeljfgifeemgbopbgbefopm">here</a> to display it.</font><br><br></div>';
+      
       const composerElem = openedComposers.find(e => e === container);
       composerElem.composerEvent = composer.addEventListener('keydown', e => {
         console.log('keydown')
         if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13 || e.keyCode == 10)) {
           console.log('mail sent!');
-          if(!composer.querySelector('[lang="itsmebanner"]')) {
-            composer.insertBefore(extensionBanner, composer.firstChild);
+          console.log(showBanner)
+          if(!composer.querySelector('[lang="itsmebanner"]') && showBanner) {
+            composer.insertBefore(getExtensionBanner(composer), composer.firstChild);
           }
           composer.removeEventListener('keydown', this);
         }
@@ -153,9 +175,9 @@ export default function createComposerUpdater(id) {
         .addEventListener('mousedown', e => {
           console.log('click');
           console.log('mail sent!');
-          console.log('mail sent!');
-          if(!composer.querySelector('[lang="itsmebanner"]')) {
-            composer.insertBefore(extensionBanner, composer.firstChild);
+          console.log(showBanner)
+          if(!composer.querySelector('[lang="itsmebanner"]') && showBanner) {
+            composer.insertBefore(getExtensionBanner(composer), composer.firstChild);
           }
         });
     }
@@ -166,10 +188,11 @@ export default function createComposerUpdater(id) {
   const observers = [];
 
   return {
-    setFont(id, family) {
+    setFont(id, family, userShowBanner) {
       userId = id;
       fontFamily = id + ', arial';
       font = family;
+      showBanner = userShowBanner;
     },
 
     // Observe if the text editor panel has been open

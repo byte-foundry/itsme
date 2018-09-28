@@ -46,7 +46,6 @@ const CustomCheckbox = styled('span')`
   display: inline-block;
   transform: translateY(8px);
   margin-right: 10px;
-  opacity: ${({ disabled }) => disabled ? 0.5 : 1};
   label {
     width: 100%;
     height: 100%;
@@ -82,24 +81,24 @@ const Option = styled('span')`
   font-size: 19px;
 `;
 
-const Confirm = () => {
+const Confirm = ({ onChoose, showBanner }) => {
   return (
     <React.Fragment>
       <Title>Almost done!</Title>
       <Text>In order to allow your contacts to see your bespoke font, we need them to install it's me.</Text>
-      {/* <Subtitle>How do you want to notify them?</Subtitle> */}
-      <Subtitle>How will they be notified?</Subtitle>
-      {/* <p style={{marginTop: '10px', marginBottom: '30px'}}>
-        <CustomCheckbox disabled>
-          <input type="checkbox" id="custom-checkbox" checked disabled/>
-          <label htmlFor="custom-checkbox">
+      <Subtitle>How do you want to notify them?</Subtitle>
+      {/* <Subtitle>How will they be notified?</Subtitle> */}
+      <p style={{marginTop: '10px', marginBottom: '30px'}}>
+        <CustomCheckbox>
+          <input type="checkbox" id="custom-checkbox" defaultChecked={showBanner} onChange={onChoose}/>
+          <label htmlFor="custom-chenckbox">
             <label htmlFor="custom-checkbox"/>
           </label>
         </CustomCheckbox>
         <Option>Add a small banner in my emails</Option>
-      </p> */}
-      <Text>We will add a small text banner at the top of your emails for those without the extension.</Text>
-      <Text>It should look like this:</Text>
+      </p>
+      {/* <Text>We will add a small text banner at the top of your emails for those without the extension.</Text> */}
+      <Text>It will look like this:</Text>
       <Img
         src={chrome.runtime.getURL(sampleImage)}
         alt="placeholder image"

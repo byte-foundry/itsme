@@ -13,6 +13,8 @@ const Button = styled('button')`
   ${buttonDefault};
   transform: scale(1.7) translateX(-5px);
   position: relative;
+  margin-left: 20px;
+  margin-right: 5px;
 `;
 
 const InfoIcon = styled('div')`
@@ -76,6 +78,7 @@ export default class App extends React.Component {
       email: null,
       selectedFamily: null,
       needLogin: false,
+      showBanner: false,
     };
   }
 
@@ -187,13 +190,14 @@ export default class App extends React.Component {
     client.setHeader('authorization', 'Bearer ' + token);
     try {
       const {
-        user: { id, choosenFont },
+        user: { id, choosenFont, showBanner },
       } = await client.request(
         gql`
           query {
             user {
               id
               choosenFont
+              showBanner
             }
           }
         `
@@ -203,13 +207,14 @@ export default class App extends React.Component {
 
       const selectedFamily = this.state.fontList.find(f => f.family === choosenFont) || choosenFont;
 
-      this.composerObserver.setFont(id, selectedFamily);
+      this.composerObserver.setFont(id, selectedFamily, showBanner);
 
       this.setState({
         id,
         selectedFamily,
         needLogin: false,
         loading: false,
+        showBanner,
       });
       runFunctionInPageContext(function () {
         ga('itsMe.send', 'event', 'User', 'Connected', '');
@@ -221,16 +226,17 @@ export default class App extends React.Component {
     }
   };
 
-  storeFamily = async family => {
-    this.setState({ selectedFamily: family });
-    this.composerObserver.setFont(this.state.id, family);
-    runFunctionInPageContext(function () {
+  storeFamily = async (family, showBanner) => {
+    this.setState({ selectedFamily: family, showBanner });
+    this.composerObserver.setFont(this.state.id, family, showBanner);
+    runFunctionInPageContext(function (showBanner) {
       ga('itsMe.send', 'event', 'User', 'SelectFont', '');
+      ga('itsMe.send', 'event', 'User', 'ShowBanner', showBanner);
     });
     await client.request(
       gql`
-        mutation changeChoosenFont($id: ID!, $font: String!) {
-          updateUser(id: $id, choosenFont: $font) {
+        mutation changeChoosenFont($id: ID!, $font: String!, $showBanner: Boolean) {
+          updateUser(id: $id, choosenFont: $font, showBanner: $showBanner) {
             id
           }
         }
@@ -238,6 +244,7 @@ export default class App extends React.Component {
       {
         id: this.state.id,
         font: family.family,
+        showBanner,
       }
     );
   };
@@ -330,6 +337,7 @@ export default class App extends React.Component {
               selectedFamily={selectedFamily}
               storeFamily={this.storeFamily}
               close={() => this.setState({ isOpen: false })}
+              showBanner={this.state.showBanner}
             />,
             this.modalRoot
           )}
