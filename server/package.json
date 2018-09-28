@@ -1,0 +1,12 @@
+{
+  "name": "itsme",
+  "version": "1.0.0",
+  "description": "My Graphcool Service",
+  "dependencies": {
+    "google-auth-library": "^0.12.0",
+    "graphcool": "^0.10.1",
+    "graphcool-lib": "^0.1.0",
+    "graphql-request": "^1.4.0",
+    "isomorphic-fetch": "^2.2.1"
+  }
+}

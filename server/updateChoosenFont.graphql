@@ -1,0 +1,4 @@
+# The current user is the only one able to change its choosenFont
+query updateChoosenFont($user_id: ID!, $node_id: ID!) {
+  SomeUserExists(filter: {id: $user_id, AND: {id: $node_id}})
+}

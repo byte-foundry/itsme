@@ -1,0 +1,3 @@
+targets:
+  itsme: shared-eu-west-1/cjajfcvlo1v4y01008dewonj1
+  default: itsme
