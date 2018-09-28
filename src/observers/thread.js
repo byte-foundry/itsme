@@ -30,15 +30,8 @@ const updateRow = (row, font) => {
 const observeConversation = ({ newURL }) => {
   // Detect URL of a conversation on Gmail
   if (!/(inbox|sent)\/[a-zA-Z0-9]+/.test(newURL)) {
-    if (/(inbox|sent)/.test(newURL)) {
-      console.log('sent - inbox list')
-    }
     return;
   }
-  
-
-  const allBanners = document.querySelectorAll('[lang="itsmebanner"]');
-  allBanners.forEach(banner => banner.style.display = 'none');
 
   console.log('Conversation detected, applying stuff');
 
@@ -79,9 +72,6 @@ const observeConversation = ({ newURL }) => {
 
       const email = emailElement.getAttribute('email');
       const font = await batchLoadFontFromEmail(email, fontList);
-
-      const allBanners = document.querySelectorAll('[lang="itsmebanner"]');
-      allBanners.forEach(banner => banner.style.display = 'none');
 
       if (!font) {
         console.warn("Couldn't find the font associated to the email", email);

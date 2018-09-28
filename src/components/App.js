@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import styled from 'react-emotion';
+import styled, { injectGlobal } from 'react-emotion';
 
 import createComposerObserver from '../observers/composer';
 import createThreadObserver from '../observers/thread';
@@ -27,6 +27,13 @@ const InfoIcon = styled('div')`
     opacity: 1;
   }
 `;
+
+// Hide all it's me banners
+injectGlobal`
+  [lang="itsmebanner"]{
+    display: none;
+  }
+`
 
 const Font = styled('div')`
   @font-face {

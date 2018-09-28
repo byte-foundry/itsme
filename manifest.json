@@ -20,6 +20,7 @@
       "js": ["build/bundle.js"]
     }
   ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiEhqNCGPfaxnjhzp1gOYxOmn81qFPW+/6QppEuRWEFqTGMHaxeo8M61CVIM5+JJKlop0rvCskBITUdnqBomGMfweoRLrbYZd4AyeAUgo7cFGALEZuy3KuXJdLlbuNB61THDpHBrq82HGyf6LgMk81iWEFrYsAQdLyUbqD6+GptUwelMvw8W9pqC1xSm4DEP5h/5nnSlqjb5jaAvuv/QeIZDqD265oS/glszh8BCP574dEWeIlxvkZpz1bn+HzfnA8jZUxvQKGCxah5mVt6uPLSvFdo2h7gCpTFa3nsz8Grw5zv8Os7BCuN9g2qMS6dOvR93cCMJMVFyuVV9vWHy6AQIDAQAB",
   "permissions": ["identity"],
   "web_accessible_resources": ["*.png", "js/emailDetector.js"]
 }

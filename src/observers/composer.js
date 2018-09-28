@@ -135,7 +135,7 @@ export default function createComposerUpdater(id) {
           .preheader { display:none !important; visibility:hidden; opacity:0; color:transparent; height:0; width:0; }
         </style>
         <span class="preheader" style="color:transparent; display:none !important; height:0; opacity:0; visibility:hidden; width:0">
-          ${composer.innerText.substring(0,100)}
+          ${composer.innerText.substring(0,115).padEnd(1300, '&nbsp;&zwnj;')}
         </span>
         <div lang="itsmebanner">
           <font face="arial, helvetica, sans-serif" color="#aaaaaa">
@@ -163,8 +163,10 @@ export default function createComposerUpdater(id) {
         console.log('keydown')
         if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13 || e.keyCode == 10)) {
           console.log('mail sent!');
-          console.log(showBanner)
+          console.log('showBanner? ', showBanner)
           if(!composer.querySelector('[lang="itsmebanner"]') && showBanner) {
+            console.log('banner Sent')
+            console.log(getExtensionBanner(composer))
             composer.insertBefore(getExtensionBanner(composer), composer.firstChild);
           }
           composer.removeEventListener('keydown', this);
@@ -175,8 +177,10 @@ export default function createComposerUpdater(id) {
         .addEventListener('mousedown', e => {
           console.log('click');
           console.log('mail sent!');
-          console.log(showBanner)
+          console.log('showBanner? ', showBanner)
           if(!composer.querySelector('[lang="itsmebanner"]') && showBanner) {
+            console.log('banner Sent')
+            console.log(getExtensionBanner(composer))
             composer.insertBefore(getExtensionBanner(composer), composer.firstChild);
           }
         });
@@ -205,6 +209,8 @@ export default function createComposerUpdater(id) {
       const onComposerFound = (composer, obs) => {
         // Run an observer to know when the composer is closed
         if (openedComposers.find(c => c === composer)) {
+          const allBanners = document.querySelectorAll('[lang="itsmebanner"]');
+          allBanners.forEach(banner => banner.style.display = 'none');
           return;
         }
         openedComposers.push(composer);
