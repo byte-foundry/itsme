@@ -1,6 +1,6 @@
 {
   "name": "It's me",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Use your unique font in Gmail.",
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",

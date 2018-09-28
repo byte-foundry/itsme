@@ -1,6 +1,6 @@
 {
   "name": "itsme",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Use your unique font in Gmail.",
   "main": "src/index.js",
   "scripts": {
