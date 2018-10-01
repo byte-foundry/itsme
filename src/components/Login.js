@@ -56,6 +56,8 @@ class Login extends React.Component {
   authenticate = interactive => {
     const { email, onLogin } = this.props;
 
+    console.log('authenticate with', email);
+
     this.setState({ loading: true });
 
     chrome.runtime.sendMessage(

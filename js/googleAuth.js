@@ -20,6 +20,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return;
   }
 
+  console.log('Google request ID with email', request.email);
+
   const redirectURL = chrome.identity.getRedirectURL();
   const clientID =
     '245602847933-kpiga4d7u65pb105lr8ede4vo5csd9ic.apps.googleusercontent.com';

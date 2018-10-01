@@ -151,6 +151,7 @@ export default class Modal extends React.Component {
           {/* Steps */}
           {needLogin && (
             <Login
+              email={email}
               onLogin={(data) => {
                 console.log('Modal received login infos', data);
                 onLogin(data);

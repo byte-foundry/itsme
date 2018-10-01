@@ -33,7 +33,7 @@ injectGlobal`
   [lang="itsmebanner"]{
     display: none;
   }
-`
+`;
 
 const Font = styled('div')`
   @font-face {
@@ -62,12 +62,12 @@ const Font = styled('div')`
   }
 `;
 
-export const runFunctionInPageContext = (fn) => {
+export const runFunctionInPageContext = fn => {
   var script = document.createElement('script');
   script.textContent = '(' + fn.toString() + '());';
   document.documentElement.appendChild(script);
   document.documentElement.removeChild(script);
-}
+};
 
 export default class App extends React.Component {
   constructor() {
@@ -101,15 +101,30 @@ export default class App extends React.Component {
     document.body.appendChild(s2);
     document.body.appendChild(this.modalRoot);
 
-    runFunctionInPageContext(function () {
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o);
-      a.async=1;a.src=g;document.documentElement.appendChild(a)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    runFunctionInPageContext(function() {
+      (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        (i[r] =
+          i[r] ||
+          function() {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date());
+        a = s.createElement(o);
+        a.async = 1;
+        a.src = g;
+        document.documentElement.appendChild(a);
+      })(
+        window,
+        document,
+        'script',
+        '//www.google-analytics.com/analytics.js',
+        'ga'
+      );
     });
 
-    runFunctionInPageContext(function () {
-      ga('create', 'UA-41962243-10', 'auto', {'name': 'itsMe'});
+    runFunctionInPageContext(function() {
+      ga('create', 'UA-41962243-10', 'auto', { name: 'itsMe' });
       ga('itsMe.send', 'pageview');
     });
 
@@ -126,7 +141,9 @@ export default class App extends React.Component {
         family =>
           family.variants.find(v => v === 'regular') &&
           family.variants.find(v => v.includes('italic')) &&
-          family.variants.find(v => v.includes('italic') && parseInt(v.split('italic')[0]) > 500)
+          family.variants.find(
+            v => v.includes('italic') && parseInt(v.split('italic')[0]) > 500
+          )
       )
       // select the variants we want
       .map(font => {
@@ -147,10 +164,9 @@ export default class App extends React.Component {
             parseInt(v.split('italic')[0]) > 600
         );
         const boldItalic = font.variants.find(
-          v =>
-            v.includes('italic') && parseInt(v.split('italic')[0]) > 500
+          v => v.includes('italic') && parseInt(v.split('italic')[0]) > 500
         );
-        
+
         return {
           ...font,
           regular: font.files[regular].replace('http:', 'https:'),
@@ -197,12 +213,13 @@ export default class App extends React.Component {
     client.setHeader('authorization', 'Bearer ' + token);
     try {
       const {
-        user: { id, choosenFont, showBanner },
+        user: { id, email, choosenFont, showBanner },
       } = await client.request(
         gql`
           query {
             user {
               id
+              email
               choosenFont
               showBanner
             }
@@ -210,9 +227,20 @@ export default class App extends React.Component {
         `
       );
 
+      if (this.state.email !== email) {
+        localStorage.removeItem('token');
+        throw new Error(
+          'Connected with ' +
+            email +
+            ' but current email is ' +
+            this.state.email
+        );
+      }
+
       console.log('Hello', this.state.email, 'your graphcool id is', id);
 
-      const selectedFamily = this.state.fontList.find(f => f.family === choosenFont) || choosenFont;
+      const selectedFamily =
+        this.state.fontList.find(f => f.family === choosenFont) || choosenFont;
 
       this.composerObserver.setFont(id, selectedFamily, showBanner);
 
@@ -223,12 +251,12 @@ export default class App extends React.Component {
         loading: false,
         showBanner,
       });
-      runFunctionInPageContext(function () {
+      runFunctionInPageContext(function() {
         ga('itsMe.send', 'event', 'User', 'Connected', '');
       });
     } catch (err) {
       // token seems invalid, need login
-      console.error(err);
+      console.warn(err);
       this.setState({ loading: false, needLogin: true });
     }
   };
@@ -236,13 +264,17 @@ export default class App extends React.Component {
   storeFamily = async (family, showBanner) => {
     this.setState({ selectedFamily: family, showBanner });
     this.composerObserver.setFont(this.state.id, family, showBanner);
-    runFunctionInPageContext(function (showBanner) {
+    runFunctionInPageContext(function(showBanner) {
       ga('itsMe.send', 'event', 'User', 'SelectFont', '');
       ga('itsMe.send', 'event', 'User', 'ShowBanner', showBanner);
     });
     await client.request(
       gql`
-        mutation changeChoosenFont($id: ID!, $font: String!, $showBanner: Boolean) {
+        mutation changeChoosenFont(
+          $id: ID!
+          $font: String!
+          $showBanner: Boolean
+        ) {
           updateUser(id: $id, choosenFont: $font, showBanner: $showBanner) {
             id
           }
@@ -260,13 +292,14 @@ export default class App extends React.Component {
     const {
       loading,
       id,
+      email,
       fontList,
       isOpen,
       needLogin,
       selectedFamily,
     } = this.state;
 
-    console.log(selectedFamily)
+    console.log(selectedFamily);
 
     return (
       <React.Fragment>
@@ -338,6 +371,7 @@ export default class App extends React.Component {
         {isOpen &&
           ReactDOM.createPortal(
             <Modal
+              email={email}
               fontList={fontList}
               needLogin={needLogin}
               onLogin={this.handleLogin}
