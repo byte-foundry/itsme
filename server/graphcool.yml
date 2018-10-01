@@ -45,7 +45,7 @@ permissions:
 - operation: User.read
 - operation: User.update
   authenticated: true
-  fields: [choosenFont]
+  fields: [choosenFont, showBanner]
   query: updateChoosenFont.graphql
 
 
